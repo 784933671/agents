@@ -24,6 +24,7 @@ Two kinds of packs live side by side in this marketplace:
 | `engineering` | development | build-engineer, code-mapper, documentation-engineer, refactoring-specialist |
 
 Total: **10 packs, 35 agents**.
+
 <!-- AGENTS-TABLE:END -->
 
 ## Install in ZCode / Claude Code

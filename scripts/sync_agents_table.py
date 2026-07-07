@@ -2,17 +2,22 @@
 """Keep README's agents table in sync with marketplace.json.
 
 Subcommands:
-  check     fetch upstream agents, compare to README, exit 1 on mismatch
-  update    fetch upstream agents, rewrite README's table block in place
-  generate  fetch upstream agents, print the expected table to stdout
+  check     build the expected table, compare to README, exit 1 on mismatch
+  update    build the expected table, rewrite README's table block in place
+  generate  build the expected table, print it to stdout
 
-No third-party dependencies (Python 3.7+ stdlib only). Talks to the GitHub
-Contents API using the sha pinned in marketplace.json. Set GITHUB_TOKEN to
-raise the rate limit (mostly relevant in CI).
+For each plugin in marketplace.json, resolves the agent list by source kind:
+  git-subdir   -> GitHub Contents API at the pinned sha (set GITHUB_TOKEN
+                  in CI to raise the rate limit)
+  local path   -> read ./<path>/agents/ directly from this repo
+
+No third-party dependencies (Python 3.7+ stdlib only).
 """
+import hashlib
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -20,11 +25,14 @@ import urllib.request
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MARKETPLACE = os.path.join(REPO_ROOT, ".claude-plugin", "marketplace.json")
 README = os.path.join(REPO_ROOT, "README.md")
+CACHE_DIR = os.path.join(REPO_ROOT, ".cache", "agents-table")
 
 START_MARKER = "<!-- AGENTS-TABLE:START -->"
 END_MARKER = "<!-- AGENTS-TABLE:END -->"
 
 API_BASE = "https://api.github.com"
+# Cache TTL for successful GitHub API responses, in seconds.
+CACHE_TTL = 6 * 60 * 60
 
 
 def die(msg, code=1):
@@ -86,13 +94,60 @@ def fetch_local_agents(rel_path):
     if not os.path.isdir(agents_dir):
         die(
             f"vendored pack has no agents/ directory: {agents_dir}\n"
-            f"  source.path was '{rel_path}'; does the directory exist?"
+            f"  source was '{rel_path}'; does the directory exist?"
         )
     return sorted(
         os.path.splitext(name)[0]
         for name in os.listdir(agents_dir)
         if name.endswith(".md") and os.path.isfile(os.path.join(agents_dir, name))
     )
+
+
+def cache_path_for(owner, repo, path, ref):
+    key = f"{owner}/{repo}/{path}@{ref}"
+    digest = hashlib.sha1(key.encode("utf-8")).hexdigest()[:16]
+    return os.path.join(CACHE_DIR, f"{digest}.json")
+
+
+def cache_read(path):
+    """Return cached agents list, or None if missing/stale/unreadable."""
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            entry = json.load(f)
+        if not isinstance(entry, dict):
+            return None
+        if time.time() - entry.get("ts", 0) > CACHE_TTL:
+            return None
+        agents = entry.get("agents")
+        if not isinstance(agents, list):
+            return None
+        return agents
+    except (OSError, ValueError):
+        return None
+
+
+def cache_read_stale(path):
+    """Return cached agents ignoring TTL, or None. Used as a fallback on API errors."""
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            entry = json.load(f)
+        agents = entry.get("agents") if isinstance(entry, dict) else None
+        return agents if isinstance(agents, list) else None
+    except (OSError, ValueError):
+        return None
+
+
+def cache_write(path, agents):
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"ts": time.time(), "agents": agents}, f)
+    except OSError:
+        pass
 
 
 def fetch_agents(owner, repo, path, ref):
@@ -103,7 +158,31 @@ def fetch_agents(owner, repo, path, ref):
         f"{API_BASE}/repos/{owner}/{repo}/contents/{quoted_path}"
         f"?ref={urllib.parse.quote(ref, safe='')}"
     )
+    cpath = cache_path_for(owner, repo, path, ref)
+    cached = cache_read(cpath)
+    if cached is not None:
+        return cached
+
     status, data = github_get(url)
+    if status == 200 and isinstance(data, list):
+        agents = sorted(
+            os.path.splitext(item["name"])[0]
+            for item in data
+            if item.get("type") == "file" and item.get("name", "").endswith(".md")
+        )
+        cache_write(cpath, agents)
+        return agents
+
+    # API failed. Try stale cache before giving up — a stale-but-correct
+    # answer is better than failing the whole run when rate-limited locally.
+    stale = cache_read_stale(cpath)
+    if stale is not None:
+        print(
+            f"warning: GitHub API returned {status} for {owner}/{repo}/{api_path}; "
+            f"using stale cache. Set GITHUB_TOKEN to avoid this.",
+            file=sys.stderr,
+        )
+        return stale
     if status == 404:
         die(
             f"agents directory not found upstream: {owner}/{repo}/{api_path} @ {ref}\n"
@@ -112,30 +191,28 @@ def fetch_agents(owner, repo, path, ref):
     if status == 403:
         die(
             f"GitHub API returned 403 (likely rate limited) for {url}\n"
-            f"  set GITHUB_TOKEN to raise the limit. response: {data}"
+            f"  set GITHUB_TOKEN to raise the limit, or re-run after a moment. "
+            f"response: {data}"
         )
-    if status != 200:
-        die(f"GitHub API returned {status} for {url}: {data}")
-    if not isinstance(data, list):
-        die(f"expected a directory listing at {url}, got {type(data).__name__}")
-    agents = sorted(
-        os.path.splitext(item["name"])[0]
-        for item in data
-        if item.get("type") == "file" and item.get("name", "").endswith(".md")
-    )
-    return agents
+    die(f"GitHub API returned {status} for {url}: {data}")
 
 
 def agents_for_pack(plugin):
     """Resolve a pack's agent list, dispatching by source kind.
 
-    Supported source kinds:
-      git-subdir  -> fetch from GitHub Contents API at the pinned ref
-      directory   -> read vendored agents/ from a local path under the repo
+    Supported `source` shapes (per Claude Code marketplace schema):
+      "./plugins/foo" (string starting with ./)  -> read vendored agents/ locally
+      {"source": "git-subdir", "url", "path", ...} -> fetch from GitHub Contents API
+      {"source": "directory", "path": "./plugins/foo"} -> legacy, read locally
     """
-    source = plugin.get("source") or {}
+    source = plugin.get("source")
+    # Relative-path string, e.g. "./plugins/web-frontend"
+    if isinstance(source, str):
+        return fetch_local_agents(source)
+    if not isinstance(source, dict):
+        die(f"pack {plugin['name']} has malformed source: {source!r}")
     kind = source.get("source")
-    if kind == "directory":
+    if kind in ("directory", "local"):
         return fetch_local_agents(source["path"])
     if kind == "git-subdir":
         owner, repo = parse_owner_repo(source["url"])
@@ -146,7 +223,8 @@ def agents_for_pack(plugin):
         return fetch_agents(owner, repo, path, ref)
     die(
         f"pack {plugin['name']} has unsupported source kind: {kind!r}\n"
-        f"  supported kinds: 'git-subdir', 'directory'"
+        f"  supported: './relative/path', {{'source':'git-subdir',...}}, "
+        f"{{'source':'directory','path':...}}"
     )
 
 
