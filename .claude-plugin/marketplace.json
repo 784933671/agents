@@ -1,18 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "784933671-agents",
-  "description": "Multi-category subagent collection for ZCode/Claude Code. Self-hosted plugin packs covering frontend, UI/UX craft, diagnostics, and engineering.",
+  "description": "Self-hosted subagent collection for ZCode/Claude Code. Plugin packs covering UI/UX craft and Vue development.",
   "owner": {
     "name": "tangtao",
     "url": "https://github.com/784933671"
   },
   "plugins": [
-    {
-      "name": "web-frontend",
-      "description": "Frontend frameworks and languages: React, Vue, Next.js, plus JavaScript and TypeScript specialists",
-      "category": "development",
-      "source": "./plugins/web-frontend"
-    },
     {
       "name": "ui-ux-craft",
       "description": "UI design, UI fixing, UX functional testing, and accessibility auditing",
@@ -20,16 +14,10 @@
       "source": "./plugins/ui-ux-craft"
     },
     {
-      "name": "diagnostics",
-      "description": "Browser-based debugging and performance investigation",
+      "name": "vue-development",
+      "description": "Vue 3 / Composition API / Pinia / Vite 专家，覆盖组件设计、响应式、路由与构建优化",
       "category": "development",
-      "source": "./plugins/diagnostics"
-    },
-    {
-      "name": "engineering",
-      "description": "Build engineering, code mapping, technical documentation, and behavior-preserving refactoring",
-      "category": "development",
-      "source": "./plugins/engineering"
+      "source": "./plugins/vue-development"
     }
   ]
 }

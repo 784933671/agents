@@ -1,20 +1,18 @@
 # 784933671-agents
 
-A multi-category **subagent collection** for ZCode / Claude Code, packaged as a plugin marketplace. One-click install gives you categorized agent packs covering frontend, UI/UX craft, diagnostics, and engineering — all self-hosted in this repo.
+A **subagent collection** for ZCode / Claude Code, packaged as a plugin marketplace. One-click install gives you categorized agent packs covering UI/UX craft and Vue development — all self-hosted in this repo.
 
 ## What's inside
 
-Four vendored packs live in this marketplace, each a set of locally authored agents (originally from `~/.zcode/agents/`) served directly from `plugins/`:
+Two vendored packs live in this marketplace, each a set of locally authored agents served directly from `plugins/`:
 
 <!-- AGENTS-TABLE:START -->
 | Pack | Category | Agents |
 |------|----------|--------|
-| `web-frontend` | development | frontend-developer, javascript-pro, nextjs-developer, react-specialist, typescript-pro, vue-expert |
 | `ui-ux-craft` | design | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester |
-| `diagnostics` | development | browser-debugger, performance-engineer |
-| `engineering` | development | build-engineer, code-mapper, documentation-engineer, refactoring-specialist |
+| `vue-development` | development | vue-expert |
 
-Total: **4 packs, 16 agents**.
+Total: **2 packs, 5 agents**.
 
 <!-- AGENTS-TABLE:END -->
 
@@ -35,10 +33,8 @@ The client reads `.claude-plugin/marketplace.json` to discover the packs; each p
 .claude-plugin/
 └── marketplace.json     ← declares the packs
 plugins/                 ← all packs live here
-├── web-frontend/        ← React, Vue, Next.js, JS, TS specialists
 ├── ui-ux-craft/         ← UI design, fixing, UX testing, accessibility
-├── diagnostics/         ← browser debugging + performance engineering
-└── engineering/         ← build, code mapping, docs, refactoring
+└── vue-development/     ← Vue 3 / Composition API / Pinia / Vite
 ```
 
 Each pack has a minimal `.claude-plugin/plugin.json` (just `name` + `description`); its agents, commands, and skills are auto-discovered from the `agents/*.md`, `commands/*.md`, and `skills/*/SKILL.md` directory conventions.
