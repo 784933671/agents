@@ -16,6 +16,7 @@ No third-party dependencies (Python 3.7+ stdlib only).
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -84,6 +85,22 @@ def github_get(url):
         die(f"network error hitting {url}: {e.reason}")
 
 
+def agent_name_from_md(text, fallback):
+    """Extract the `name:` field from a markdown agent file's frontmatter.
+
+    Falls back to `fallback` (typically the filename stem) if there's no
+    frontmatter or no name field. Strips surrounding quotes if present.
+    """
+    if not text.startswith("---"):
+        return fallback
+    end = text.find("\n---", 3)
+    if end == -1:
+        return fallback
+    fm = text[3:end]
+    match = re.search(r"^name:\s*\"?([^\"\n]+?)\"?\s*$", fm, re.MULTILINE)
+    return match.group(1) if match else fallback
+
+
 def fetch_local_agents(rel_path):
     """Return a sorted list of agent names from a vendored (directory) pack.
 
@@ -96,11 +113,19 @@ def fetch_local_agents(rel_path):
             f"vendored pack has no agents/ directory: {agents_dir}\n"
             f"  source was '{rel_path}'; does the directory exist?"
         )
-    return sorted(
-        os.path.splitext(name)[0]
-        for name in os.listdir(agents_dir)
-        if name.endswith(".md") and os.path.isfile(os.path.join(agents_dir, name))
-    )
+    names = []
+    for fname in os.listdir(agents_dir):
+        if not (fname.endswith(".md") and os.path.isfile(os.path.join(agents_dir, fname))):
+            continue
+        stem = os.path.splitext(fname)[0]
+        try:
+            with open(os.path.join(agents_dir, fname), encoding="utf-8") as f:
+                text = f.read()
+        except OSError:
+            names.append(stem)
+            continue
+        names.append(agent_name_from_md(text, stem))
+    return sorted(names)
 
 
 def cache_path_for(owner, repo, path, ref):

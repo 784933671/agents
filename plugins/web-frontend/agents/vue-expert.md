@@ -1,5 +1,5 @@
 ---
-name: "vue-expert"
+name: "web-frontend-vue-expert"
 description: "当某项任务需要 Vue 方面的专业知识，涉及组件行为、Composition API 使用模式、路由，或状态与渲染相关问题时使用。"
 color: yellow
 ---

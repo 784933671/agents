@@ -1,5 +1,5 @@
 ---
-name: "accessibility-tester"
+name: "ui-ux-craft-accessibility-tester"
 description: "当任务需要对 UI 变更、交互流程或组件行为进行无障碍性审计时使用。"
 color: red
 tools:

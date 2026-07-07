@@ -1,5 +1,5 @@
 ---
-name: "performance-engineer"
+name: "diagnostics-performance-engineer"
 description: "当任务需要对慢请求、热点路径、渲染回归或可扩展性瓶颈进行性能调查时使用。"
 color: red
 tools:

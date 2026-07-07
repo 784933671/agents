@@ -1,5 +1,5 @@
 ---
-name: "react-specialist"
+name: "web-frontend-react-specialist"
 description: "当任务需要专注于 React 的代理来处理组件行为、状态流转、渲染缺陷或现代 React 模式时使用。"
 color: blue
 ---

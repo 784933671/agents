@@ -1,5 +1,5 @@
 ---
-name: "browser-debugger"
+name: "diagnostics-browser-debugger"
 description: "当任务需要基于浏览器的复现、UI 证据采集，或通过浏览器 MCP 服务端进行客户端调试时使用。"
 color: red
 ---

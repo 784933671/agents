@@ -1,5 +1,5 @@
 ---
-name: "ui-designer"
+name: "ui-ux-craft-ui-designer"
 description: "适用于在开发前或开发过程中，需要明确的用户界面决策、交互设计以及可直接用于实现的设计指导的任务。"
 color: yellow
 ---

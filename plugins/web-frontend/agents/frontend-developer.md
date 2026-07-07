@@ -1,5 +1,5 @@
 ---
-name: "frontend-developer"
+name: "web-frontend-frontend-developer"
 description: "当任务需要进行有边界的前端实现或 UI 缺陷修复，并要求生产级的行为与质量时使用。"
 color: yellow
 ---

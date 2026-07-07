@@ -1,5 +1,5 @@
 ---
-name: "ui-fixer"
+name: "ui-ux-craft-ui-fixer"
 description: "当UI问题已复现，且父级代理希望应用最小范围的安全补丁时使用。"
 color: yellow
 tools:

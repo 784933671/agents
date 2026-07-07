@@ -1,5 +1,5 @@
 ---
-name: "nextjs-developer"
+name: "web-frontend-nextjs-developer"
 description: "当任务需要进行 Next.js 专属工作，涉及路由、渲染模式、Server Actions、数据获取或对部署敏感的前端行为时使用。"
 color: blue
 ---

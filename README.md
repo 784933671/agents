@@ -18,10 +18,10 @@ Two kinds of packs live side by side in this marketplace:
 | `debugging-toolkit` | development | debugger, dx-optimizer |
 | `code-refactoring` | development | code-reviewer, legacy-modernizer |
 | `ui-design` | design | accessibility-expert, design-system-architect, ui-designer |
-| `web-frontend` | development | frontend-developer, javascript-pro, nextjs-developer, react-specialist, typescript-pro, vue-expert |
-| `ui-ux-craft` | design | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester |
-| `diagnostics` | development | browser-debugger, performance-engineer |
-| `engineering` | development | build-engineer, code-mapper, documentation-engineer, refactoring-specialist |
+| `web-frontend` | development | web-frontend-frontend-developer, web-frontend-javascript-pro, web-frontend-nextjs-developer, web-frontend-react-specialist, web-frontend-typescript-pro, web-frontend-vue-expert |
+| `ui-ux-craft` | design | ui-ux-craft-accessibility-tester, ui-ux-craft-ui-designer, ui-ux-craft-ui-fixer, ui-ux-craft-ui-ux-tester |
+| `diagnostics` | development | diagnostics-browser-debugger, diagnostics-performance-engineer |
+| `engineering` | development | engineering-build-engineer, engineering-code-mapper, engineering-documentation-engineer, engineering-refactoring-specialist |
 
 Total: **10 packs, 35 agents**.
 

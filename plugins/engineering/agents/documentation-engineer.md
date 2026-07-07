@@ -1,5 +1,5 @@
 ---
-name: "documentation-engineer"
+name: "engineering-documentation-engineer"
 description: "当任务需要撰写必须忠实于当前代码、工具与运维工作流的技术文档时使用。"
 color: green
 ---
