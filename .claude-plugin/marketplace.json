@@ -84,6 +84,42 @@
         "sha": "5cc2549a50fc672230efd0a0307e2fd27ffba792"
       },
       "homepage": "https://github.com/wshobson/agents/tree/main/plugins/ui-design"
+    },
+    {
+      "name": "web-frontend",
+      "description": "Frontend frameworks and languages: React, Vue, Next.js, plus JavaScript and TypeScript specialists",
+      "category": "development",
+      "source": {
+        "source": "directory",
+        "path": "./plugins/web-frontend"
+      }
+    },
+    {
+      "name": "ui-ux-craft",
+      "description": "UI design, UI fixing, UX functional testing, and accessibility auditing",
+      "category": "design",
+      "source": {
+        "source": "directory",
+        "path": "./plugins/ui-ux-craft"
+      }
+    },
+    {
+      "name": "diagnostics",
+      "description": "Browser-based debugging and performance investigation",
+      "category": "development",
+      "source": {
+        "source": "directory",
+        "path": "./plugins/diagnostics"
+      }
+    },
+    {
+      "name": "engineering",
+      "description": "Build engineering, code mapping, technical documentation, and behavior-preserving refactoring",
+      "category": "development",
+      "source": {
+        "source": "directory",
+        "path": "./plugins/engineering"
+      }
     }
   ]
 }

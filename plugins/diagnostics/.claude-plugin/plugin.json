@@ -1,0 +1,4 @@
+{
+  "name": "diagnostics",
+  "description": "Browser-based debugging and performance investigation for slow requests, hot paths, and rendering regressions."
+}
