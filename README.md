@@ -1,11 +1,15 @@
 # 784933671-agents
 
-A curated multi-category **subagent collection** for ZCode / Claude Code, packaged as a plugin marketplace. One-click install gives you categorized agent packs sourced from high-quality community repos.
+A curated multi-category **subagent collection** for ZCode / Claude Code, packaged as a plugin marketplace. One-click install gives you categorized agent packs — some sourced from high-quality community repos, some vendored from a local agent collection.
 
 ## What's inside
 
-Currently bundles agent packs from [`wshobson/agents`](https://github.com/wshobson/agents), pinned to commit `5cc2549a` (2026-06-25).
+Two kinds of packs live side by side in this marketplace:
 
+- **Upstream packs** — referenced from [`wshobson/agents`](https://github.com/wshobson/agents), pinned to commit `5cc2549a` (2026-06-25). Fetched on demand via `git-subdir`.
+- **Vendored packs** — a set of locally authored agents (originally in `~/.zcode/agents/`), copied into `plugins/` and served from this repo directly.
+
+<!-- AGENTS-TABLE:START -->
 | Pack | Category | Agents |
 |------|----------|--------|
 | `frontend-mobile-development` | development | frontend-developer, mobile-developer |
@@ -14,8 +18,13 @@ Currently bundles agent packs from [`wshobson/agents`](https://github.com/wshobs
 | `debugging-toolkit` | development | debugger, dx-optimizer |
 | `code-refactoring` | development | code-reviewer, legacy-modernizer |
 | `ui-design` | design | accessibility-expert, design-system-architect, ui-designer |
+| `web-frontend` | development | frontend-developer, javascript-pro, nextjs-developer, react-specialist, typescript-pro, vue-expert |
+| `ui-ux-craft` | design | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester |
+| `diagnostics` | development | browser-debugger, performance-engineer |
+| `engineering` | development | build-engineer, code-mapper, documentation-engineer, refactoring-specialist |
 
-Total: **6 packs, 19 agents**.
+Total: **10 packs, 35 agents**.
+<!-- AGENTS-TABLE:END -->
 
 ## Install in ZCode / Claude Code
 
@@ -26,21 +35,25 @@ Total: **6 packs, 19 agents**.
    ```
 3. Browse the marketplace and install whichever pack(s) you want.
 
-The client reads `.claude-plugin/marketplace.json` to discover the packs. Each pack is fetched on demand via `git-subdir` from the pinned commit — nothing is vendored here.
+The client reads `.claude-plugin/marketplace.json` to discover the packs. Upstream packs are fetched on demand via `git-subdir` from the pinned commit; vendored packs are served directly from `plugins/`.
 
 ## How it's structured
 
 ```
 .claude-plugin/
-└── marketplace.json     ← declares the 6 packs (this is all you need)
-plugins/                 ← reserved for any future self-hosted packs
+└── marketplace.json     ← declares all packs (upstream + vendored)
+plugins/                 ← vendored packs live here
+├── web-frontend/        ← React, Vue, Next.js, JS, TS specialists
+├── ui-ux-craft/         ← UI design, fixing, UX testing, accessibility
+├── diagnostics/         ← browser debugging + performance engineering
+└── engineering/         ← build, code mapping, docs, refactoring
 ```
 
-This repo only ships the **manifest**. The actual agent `.md` files live in the source repos and are pulled by reference (`git-subdir` + `sha`). This keeps the repo tiny and lets upstream updates flow in by bumping the pinned commit.
+Each vendored pack has a minimal `.claude-plugin/plugin.json` (just `name` + `description`); its agents are auto-discovered from the `agents/*.md` directory convention.
 
-## Updating the pin
+## Updating the upstream pin
 
-To pick up new agents from upstream:
+To pick up new agents from `wshobson/agents`:
 
 1. Get the latest SHA of the source repo:
    ```bash
@@ -49,16 +62,31 @@ To pick up new agents from upstream:
 2. Replace the `sha` field in `.claude-plugin/marketplace.json` (and `ref` if the branch changed).
 3. Commit and push.
 
-## Adding more source repos
+## Adding more packs
 
 Add new entries to the `plugins` array in `marketplace.json`. Supported source types:
 
-- `git-subdir` — pull a subdirectory from a git repo (used here)
+- `git-subdir` — pull a subdirectory from a git repo (used for wshobson packs)
+- `directory` — serve a vendored pack from `./plugins/<name>` (used for local packs)
 - `url` — pull an entire git repo as a plugin
-- local path — `./plugins/your-pack` if you vendor your own
 
-Each entry needs `name`, `description`, `category`, `source`, and ideally `homepage`.
+Each entry needs `name`, `description`, `category`, and `source`. Upstream entries should also carry `homepage`.
+
+## Keeping the table in sync
+
+The agents table above (between the `AGENTS-TABLE` markers) is generated from `marketplace.json` and the resolved `agents/` directories — **don't hand-edit it**.
+
+After any change to `marketplace.json` or a vendored pack's `agents/`, refresh the table:
+
+```bash
+python scripts/sync_agents_table.py update
+```
+
+Other useful subcommands:
+
+- `generate` — print the expected table to stdout (no files touched)
+- `check` — verify the table matches what the packs declare; exits non-zero on mismatch
 
 ## License
 
-The manifest in this repo is MIT. The bundled agents retain their upstream licenses (see [wshobson/agents](https://github.com/wshobson/agents)).
+The manifests and vendored agents in this repo are MIT. The upstream packs retain their upstream licenses (see [wshobson/agents](https://github.com/wshobson/agents)).
