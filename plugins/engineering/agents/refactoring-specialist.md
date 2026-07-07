@@ -1,5 +1,5 @@
 ---
-name: "engineering-refactoring-specialist"
+name: "refactoring-specialist"
 description: "当任务需要进行低风险的结构性重构，在保留行为的同时提升可读性、模块化或可维护性时使用。"
 color: green
 ---

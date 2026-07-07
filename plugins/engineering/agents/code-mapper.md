@@ -1,5 +1,5 @@
 ---
-name: "engineering-code-mapper"
+name: "code-mapper"
 description: "当父级代理在进行变更前，需要对代码路径、归属边界及执行流程建立高置信度的映射时使用。"
 color: yellow
 tools:

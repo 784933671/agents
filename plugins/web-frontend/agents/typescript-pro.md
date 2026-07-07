@@ -1,5 +1,5 @@
 ---
-name: "web-frontend-typescript-pro"
+name: "typescript-pro"
 description: "当任务需要强有力的 TypeScript 支持，处理类型、接口、重构或编译器驱动的修复时使用。"
 color: blue
 ---

@@ -1,90 +1,12 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "784933671-agents",
-  "description": "Curated multi-category subagent collection for ZCode/Claude Code. Bundles high-quality agents from the community (currently wshobson/agents) into categorized plugin packs: frontend, backend, JS/TS, debugging, refactoring, UI design.",
+  "description": "Multi-category subagent collection for ZCode/Claude Code. Self-hosted plugin packs covering frontend, UI/UX craft, diagnostics, and engineering.",
   "owner": {
     "name": "tangtao",
     "url": "https://github.com/784933671"
   },
   "plugins": [
-    {
-      "name": "frontend-mobile-development",
-      "description": "Frontend, mobile and web UI development across platforms",
-      "category": "development",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/wshobson/agents.git",
-        "path": "plugins/frontend-mobile-development",
-        "ref": "main",
-        "sha": "5cc2549a50fc672230efd0a0307e2fd27ffba792"
-      },
-      "homepage": "https://github.com/wshobson/agents/tree/main/plugins/frontend-mobile-development"
-    },
-    {
-      "name": "backend-development",
-      "description": "Backend API design, GraphQL, Temporal workflows, TDD and security auditing",
-      "category": "development",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/wshobson/agents.git",
-        "path": "plugins/backend-development",
-        "ref": "main",
-        "sha": "5cc2549a50fc672230efd0a0307e2fd27ffba792"
-      },
-      "homepage": "https://github.com/wshobson/agents/tree/main/plugins/backend-development"
-    },
-    {
-      "name": "javascript-typescript",
-      "description": "JavaScript and TypeScript with modern web frameworks and Node.js",
-      "category": "development",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/wshobson/agents.git",
-        "path": "plugins/javascript-typescript",
-        "ref": "main",
-        "sha": "5cc2549a50fc672230efd0a0307e2fd27ffba792"
-      },
-      "homepage": "https://github.com/wshobson/agents/tree/main/plugins/javascript-typescript"
-    },
-    {
-      "name": "debugging-toolkit",
-      "description": "Interactive debugging workflows and developer experience optimization",
-      "category": "development",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/wshobson/agents.git",
-        "path": "plugins/debugging-toolkit",
-        "ref": "main",
-        "sha": "5cc2549a50fc672230efd0a0307e2fd27ffba792"
-      },
-      "homepage": "https://github.com/wshobson/agents/tree/main/plugins/debugging-toolkit"
-    },
-    {
-      "name": "code-refactoring",
-      "description": "Code cleanup, refactoring automation, and technical debt management",
-      "category": "development",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/wshobson/agents.git",
-        "path": "plugins/code-refactoring",
-        "ref": "main",
-        "sha": "5cc2549a50fc672230efd0a0307e2fd27ffba792"
-      },
-      "homepage": "https://github.com/wshobson/agents/tree/main/plugins/code-refactoring"
-    },
-    {
-      "name": "ui-design",
-      "description": "UI/UX design systems, accessibility, and modern interaction patterns",
-      "category": "design",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/wshobson/agents.git",
-        "path": "plugins/ui-design",
-        "ref": "main",
-        "sha": "5cc2549a50fc672230efd0a0307e2fd27ffba792"
-      },
-      "homepage": "https://github.com/wshobson/agents/tree/main/plugins/ui-design"
-    },
     {
       "name": "web-frontend",
       "description": "Frontend frameworks and languages: React, Vue, Next.js, plus JavaScript and TypeScript specialists",

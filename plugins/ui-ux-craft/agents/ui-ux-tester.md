@@ -1,5 +1,5 @@
 ---
-name: "ui-ux-craft-ui-ux-tester"
+name: "ui-ux-tester"
 description: "当任务需要以文档化用户流程为驱动，进行详尽的 UI 与 UX 功能测试，并输出结构化缺陷报告时使用。"
 color: red
 tools:

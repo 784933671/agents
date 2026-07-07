@@ -1,5 +1,5 @@
 ---
-name: "engineering-build-engineer"
+name: "build-engineer"
 description: "当任务需要进行构建图调试、打包修复、编译管线工作或 CI 构建稳定化时使用。"
 color: green
 ---

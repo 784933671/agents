@@ -1,5 +1,5 @@
 ---
-name: "web-frontend-javascript-pro"
+name: "javascript-pro"
 description: "当任务需要进行以 JavaScript 为核心的工作，涉及运行时行为、浏览器或 Node 执行，或非 TypeScript 主导的应用层代码时使用。"
 color: blue
 ---
