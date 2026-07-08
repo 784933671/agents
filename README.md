@@ -16,6 +16,16 @@ Total: **2 packs, 5 agents**.
 
 <!-- AGENTS-TABLE:END -->
 
+## Choosing an agent
+
+| Agent | Use when |
+|-------|----------|
+| `ui-designer` | You need UI design direction, layout decisions, interaction states, or design system alignment. |
+| `ui-fixer` | You have a reproduced UI bug, layout issue, style regression, or responsive breakpoint problem. |
+| `ui-ux-tester` | You need end-to-end UI/UX flow testing, state coverage, or a structured defect report. |
+| `accessibility-tester` | You need keyboard, focus, ARIA, contrast, screen reader, or WCAG A/AA review. |
+| `vue-expert` | You need Vue 3, Composition API, Pinia, Vue Router, Vite, SFC, reactivity, or component architecture help. |
+
 ## Install in ZCode / Claude Code
 
 1. Open your client's plugin marketplace settings.
