@@ -1,10 +1,14 @@
 MIT License
 
 Copyright (c) 2025-PRESENT Anthony Fu <https://github.com/antfu>
+Copyright (c) vuejs-ai contributors <https://github.com/vuejs-ai>
 
-The pinia skill in this pack is derived from https://github.com/antfu/skills
-(generated from the official Pinia documentation at https://github.com/vuejs/pinia)
-and is distributed under the MIT License.
+The skills in this pack (pinia, vite, vue, vue-best-practices) are derived from
+https://github.com/antfu/skills and distributed under the MIT License.
+
+- pinia, vite, vue: generated from official docs (vuejs/pinia, vitejs/vite,
+  vuejs/docs) by Anthony Fu's scripts.
+- vue-best-practices: vendored from github.com/vuejs-ai/skills.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
