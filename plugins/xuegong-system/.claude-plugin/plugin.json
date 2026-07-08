@@ -1,0 +1,5 @@
+{
+  "name": "xuegong-system",
+  "description": "学工系统 Apifox MCP 接入。",
+  "mcpServers": "./.mcp.json"
+}

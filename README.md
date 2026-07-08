@@ -11,8 +11,9 @@ Two vendored packs live in this marketplace, each a set of locally authored agen
 |------|----------|--------|
 | `ui-ux-craft` | design | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester |
 | `vue-development` | development | vue-expert |
+| `xuegong-system` | development | xuegong-api-expert |
 
-Total: **2 packs, 5 agents**.
+Total: **3 packs, 6 agents**.
 
 <!-- AGENTS-TABLE:END -->
 
@@ -25,6 +26,7 @@ Total: **2 packs, 5 agents**.
 | `ui-ux-tester` | You need end-to-end UI/UX flow testing, state coverage, or a structured defect report. |
 | `accessibility-tester` | You need keyboard, focus, ARIA, contrast, screen reader, or WCAG A/AA review. |
 | `vue-expert` | You need Vue 3, Composition API, Pinia, Vue Router, Vite, SFC, reactivity, or component architecture help. |
+| `xuegong-api-expert` | You need 学工系统 Apifox MCP 接口查询、参数确认、请求示例或响应结构说明. |
 
 ## Choosing a skill
 

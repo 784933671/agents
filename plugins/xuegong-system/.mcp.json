@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "学工系统": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "apifox-mcp-server@latest",
+        "--project-id=7802011"
+      ],
+      "env": {
+        "APIFOX_ACCESS_TOKEN": "afxp_cbbb0fOBqksF1RHulmafMIEqLKRuyoMMNj4O"
+      }
+    }
+  }
+}
