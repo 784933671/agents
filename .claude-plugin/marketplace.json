@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "784933671-agents",
-  "description": "Self-hosted agent and skill collection for ZCode/Claude Code. Plugin packs covering UI/UX craft, Vue development, JavaScript development, and project-specific API assistance.",
+  "description": "自托管 zCode 插件市场，提供 UI/UX、Vue、JavaScript 和项目专用 API 能力包。",
   "owner": {
     "name": "tangtao",
     "url": "https://github.com/784933671"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "ui-ux-craft",
-      "description": "UI design, UI fixing, UX functional testing, and accessibility auditing",
+      "description": "UI 设计、UI 修复、UX 功能测试与可访问性审查",
       "category": "design",
       "source": "./plugins/ui-ux-craft"
     },
@@ -21,7 +21,7 @@
     },
     {
       "name": "javascript-development",
-      "description": "JavaScript ES2023+ / async-await / ESM / Node.js / Browser API 专家，覆盖现代 JS 开发、调试与重构",
+      "description": "JavaScript ES2023+ / async-await / ESM / Node.js / 浏览器 API 专家，覆盖现代 JS 开发、调试与重构",
       "category": "development",
       "source": "./plugins/javascript-development"
     },

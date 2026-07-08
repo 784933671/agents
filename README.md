@@ -1,114 +1,206 @@
 # 784933671-agents
 
-一个面向 **ZCode / Claude Code** 的自托管 agents 与 skills 插件市场。安装后可按分类选择 UI/UX、Vue、JavaScript 和项目专用 API 能力包。
+这是一个面向 **zCode** 的自托管插件市场，用来分发可安装的代理、技能、命令和 MCP 能力包。
 
-## What's inside
+这个仓库不是业务应用源码，也不是前端/后端项目模板。模型读取本仓库时，应把它理解为“zCode 插件市场”：维护 `.claude-plugin/marketplace.json`，并在 `plugins/` 下按能力包组织可安装能力。
 
-本市场的所有 pack 都内置在 `plugins/` 目录下，安装时直接从仓库读取：
+说明：本项目使用 `.claude-plugin` 目录和 `SKILL.md` 结构作为 zCode 插件市场的兼容清单格式。文档中的 `.claude-plugin` 是技术目录约定，不表示本项目面向其他产品分发。
+
+## 模型使用指南
+
+当你在这个仓库工作时，先判断用户目标属于哪一类：
+
+| 用户目标 | 应该怎么做 |
+|----------|------------|
+| 想给 zCode 增加一个可安装能力 | 新增或修改 `plugins/<pack-name>/`，并更新 `.claude-plugin/marketplace.json` |
+| 想增加一个专门执行复杂任务的角色 | 新增 `plugins/<pack-name>/agents/<agent-name>.md` |
+| 想增加一套可被模型按需调用的知识、流程或规范 | 新增 `plugins/<pack-name>/skills/<skill-name>/SKILL.md` |
+| 想增加斜杠命令 | 新增 `plugins/<pack-name>/commands/<command-name>.md`，命令内容必须包含 `$ARGUMENTS` |
+| 想接入外部服务或工具 | 在对应能力包中配置 MCP，例如 `.mcp.json` |
+| 想修改市场展示或安装入口 | 修改 `.claude-plugin/marketplace.json` 和本 README |
+
+处理请求时遵循这些原则：
+
+- 优先复用现有能力包、代理、技能和脚本，不重复创建相同能力。
+- 新能力应放在最贴近语义的能力包中；跨领域能力才新增能力包。
+- 代理适合较重的流程、审查、修复、测试和跨步骤任务。
+- 技能适合轻量知识、规范、API 模式、最佳实践和可复用执行流程。
+- 不要手改 `AGENTS-TABLE` 标记之间的表格，用脚本生成。
+- 改完市场清单、代理或技能后，必须运行 `python3 -m unittest scripts/test_verify.py` 和 `python3 scripts/verify.py`。
+
+## 市场内容
+
+本市场的所有能力包都内置在 `plugins/` 目录下，安装时直接从仓库读取：
 
 <!-- AGENTS-TABLE:START -->
-| Pack | Category | Agents | Skills |
-|------|----------|--------|--------|
-| `ui-ux-craft` | design | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester | ui-fix-playbook, ux-test-design, wcag-essentials |
-| `vue-development` | development | vue-expert | pinia, vite, vue, vue-best-practices, vue-router-best-practices |
-| `javascript-development` | development | _(none)_ | javascript-pro |
-| `xuegong-system` | development | xuegong-api-expert | _(none)_ |
+| 能力包 | 分类 | 代理 | 技能 |
+|--------|------|------|------|
+| `ui-ux-craft` | 设计 | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester | ui-fix-playbook, ux-test-design, wcag-essentials |
+| `vue-development` | 开发 | vue-expert | pinia, vite, vue, vue-best-practices, vue-router-best-practices |
+| `javascript-development` | 开发 | _(none)_ | javascript-pro |
+| `xuegong-system` | 开发 | xuegong-api-expert | _(none)_ |
 
-Total: **4 packs, 6 agents, 9 skills**.
+总计：**4 个能力包，6 个代理，9 个技能**。
 
 <!-- AGENTS-TABLE:END -->
 
-## Choosing an agent
+## 选择能力包
 
-| Agent | Use when |
+| 能力包 | 适用场景 |
+|------|----------|
+| `ui-ux-craft` | UI 设计、视觉修复、交互走查、可访问性审查、用户流程测试 |
+| `vue-development` | Vue 3、Composition API、Pinia、Vue Router、Vite、SFC 和组件架构 |
+| `javascript-development` | 现代 JavaScript、async/await、ESM/CJS、Node.js、浏览器 API、`.js/.mjs/.cjs` 审查 |
+| `xuegong-system` | 学工系统接口查询、Apifox MCP 调用、接口参数和响应结构确认 |
+
+## 选择代理
+
+代理是更重的任务执行角色。任务需要审查、修复、测试、流程推进或外部工具协作时，优先选择代理。
+
+| 代理 | 使用场景 |
 |-------|----------|
-| `ui-designer` | You need UI design direction, layout decisions, interaction states, or design system alignment. |
-| `ui-fixer` | You have a reproduced UI bug, layout issue, style regression, or responsive breakpoint problem. |
-| `ui-ux-tester` | You need end-to-end UI/UX flow testing, state coverage, or a structured defect report. |
-| `accessibility-tester` | You need keyboard, focus, ARIA, contrast, screen reader, or WCAG A/AA review. |
-| `vue-expert` | You need Vue 3, Composition API, Pinia, Vue Router, Vite, SFC, reactivity, or component architecture help. |
-| `xuegong-api-expert` | You need 学工系统 Apifox MCP 接口查询、参数确认、请求示例或响应结构说明. |
+| `ui-designer` | 需要 UI 设计方向、布局决策、交互状态、设计系统对齐或页面体验建议 |
+| `ui-fixer` | 已复现 UI bug、布局异常、样式回归或响应式断点问题，需要最小范围修复 |
+| `ui-ux-tester` | 需要端到端 UI/UX 流程测试、状态覆盖、缺陷报告或体验走查 |
+| `accessibility-tester` | 需要键盘、焦点、ARIA、对比度、屏幕阅读器或 WCAG A/AA 审查 |
+| `vue-expert` | 需要 Vue 3、Composition API、Pinia、Vue Router、Vite、SFC、响应式或组件架构支持 |
+| `xuegong-api-expert` | 需要学工系统 Apifox MCP 接口查询、参数确认、请求示例或响应结构说明 |
 
-## Choosing a skill
+## 选择技能
 
-Use skills for focused knowledge, API patterns, and lightweight guidance. Use agents when the task needs a larger audit, repair, or test workflow.
+技能是按需加载的知识与流程。任务只需要规范、API 参考、最佳实践或轻量指导时，优先选择技能。
 
-| Skill | Use when |
+| 技能 | 使用场景 |
 |-------|----------|
-| `vue` | You need Vue API, SFC, reactivity, lifecycle, watcher, or `<script setup>` guidance. |
-| `vue-best-practices` | You need Vue architecture, component boundaries, data flow, composables, or implementation standards. |
-| `pinia` | You need store design, state/getters/actions, SSR, HMR, or testing guidance. |
-| `vue-router-best-practices` | You need route guard, route params, redirect loop, or route lifecycle guidance. |
-| `vite` | You need Vite config, plugin, build, SSR, environment, or Rolldown migration guidance. |
-| `javascript-pro` | You need modern JavaScript, async/await, ESM/CJS modules, Node.js, browser APIs, or `.js/.mjs/.cjs` review guidance. |
-| `wcag-essentials` | You need WCAG A/AA, ARIA, keyboard, focus, contrast, or accessible component guidance. |
-| `ui-fix-playbook` | You need UI defect triage, root cause isolation, minimal repair, or regression verification guidance. |
-| `ux-test-design` | You need user-flow test design, state coverage, test cases, or defect report structure. |
+| `vue` | 需要 Vue API、SFC、响应式、生命周期、watcher 或 `<script setup>` 指导 |
+| `vue-best-practices` | 需要 Vue 架构、组件边界、数据流、composables 或实现规范 |
+| `pinia` | 需要 store 设计、state/getters/actions、SSR、HMR 或测试指导 |
+| `vue-router-best-practices` | 需要路由守卫、路由参数、重定向循环或路由生命周期指导 |
+| `vite` | 需要 Vite 配置、插件、构建、SSR、环境变量或 Rolldown 迁移指导 |
+| `javascript-pro` | 需要现代 JavaScript、async/await、ESM/CJS、Node.js、浏览器 API 或 `.js/.mjs/.cjs` 审查指导 |
+| `wcag-essentials` | 需要 WCAG A/AA、ARIA、键盘、焦点、对比度或无障碍组件指导 |
+| `ui-fix-playbook` | 需要 UI 缺陷定位、根因隔离、最小修复或回归验证指导 |
+| `ux-test-design` | 需要用户流程测试设计、状态覆盖、测试用例或缺陷报告结构 |
 
-## Install in ZCode / Claude Code
+## 安装方式
 
-1. Open your client's plugin marketplace settings.
-2. Add a marketplace with this repo's URL:
-   ```
-   https://github.com/784933671/agents.git
-   ```
-3. Browse the marketplace and install whichever pack(s) you want.
+在 zCode 的插件市场设置中添加本仓库：
 
-The client reads `.claude-plugin/marketplace.json` to discover the packs; each pack is served directly from `plugins/<name>` in this repo.
-
-## How it's structured
-
+```bash
+https://github.com/784933671/agents.git
 ```
+
+客户端会读取 `.claude-plugin/marketplace.json` 来发现可安装能力包。每个能力包都从 `plugins/<name>` 目录加载。
+
+安装后，技能通常以命名空间方式调用，例如：
+
+```text
+/javascript-development:javascript-pro
+```
+
+## 目录结构
+
+```text
 .claude-plugin/
-└── marketplace.json     ← declares the packs
-plugins/                 ← all packs live here
-├── javascript-development/ ← JavaScript ES2023+ / async / ESM / Node.js / Browser API
-├── ui-ux-craft/         ← UI design, fixing, UX testing, accessibility
-└── vue-development/     ← Vue 3 / Composition API / Pinia / Vite
+└── marketplace.json          # 插件市场入口，声明所有能力包
+plugins/
+├── javascript-development/   # JavaScript ES2023+ / async / ESM / Node.js / Browser API
+├── ui-ux-craft/              # UI 设计、修复、UX 测试、可访问性
+├── vue-development/          # Vue 3 / Composition API / Pinia / Vite
+└── xuegong-system/           # 学工系统 Apifox MCP 接入
 ```
 
-Each pack has a minimal `.claude-plugin/plugin.json` (just `name` + `description`); its agents, commands, and skills are auto-discovered from the `agents/*.md`, `commands/*.md`, and `skills/*/SKILL.md` directory conventions.
+每个能力包至少包含：
 
-## Adding more packs
-
-Add new entries to the `plugins` array in `marketplace.json`. Each entry needs `name`, `description`, `category`, and a `source` pointing at a vendored directory under `plugins/`:
-
-```json
-{
-  "name": "your-pack",
-  "description": "...",
-  "category": "development",
-  "source": "./plugins/your-pack"
-}
+```text
+plugins/<pack-name>/
+└── .claude-plugin/
+    └── plugin.json
 ```
 
-## Keeping the table in sync
+可选能力目录：
 
-The contents table above (between the `AGENTS-TABLE` markers) is generated from `marketplace.json` and the resolved `agents/` / `skills/` directories — **don't hand-edit it**.
+```text
+agents/*.md                  # 子代理角色
+commands/*.md                # 斜杠命令，必须包含 $ARGUMENTS
+skills/*/SKILL.md            # 技能入口，可包含 references/scripts/assets
+.mcp.json                    # MCP 配置
+```
 
-After any change to `marketplace.json` or a pack's `agents/` / `skills/`, refresh the table:
+## 新增或修改能力
+
+新增能力包：
+
+1. 创建 `plugins/<pack-name>/.claude-plugin/plugin.json`。
+2. 按需添加 `agents/`、`skills/`、`commands/` 或 MCP 配置。
+3. 在 `.claude-plugin/marketplace.json` 的 `plugins` 数组中新增入口。
+4. 运行 `python3 scripts/sync_agents_table.py update`。
+5. 运行 `python3 scripts/verify.py`。
+
+新增代理：
+
+1. 创建 `plugins/<pack-name>/agents/<agent-name>.md`。
+2. frontmatter 必须包含 `name`、`description`、`model`。
+3. `name` 必须与文件名 stem 一致。
+4. 更新 README 路由表中的 `选择代理`。
+
+新增技能：
+
+1. 创建 `plugins/<pack-name>/skills/<skill-name>/SKILL.md`。
+2. frontmatter 必须包含 `name`、`description`。
+3. 如需长文档，放到同级 `references/` 并在 `SKILL.md` 中链接。
+4. 更新 README 路由表中的 `选择技能`。
+
+新增命令：
+
+1. 创建 `plugins/<pack-name>/commands/<command-name>.md`。
+2. 文件内容必须包含 `$ARGUMENTS`。
+
+## 同步自动表格
+
+`AGENTS-TABLE` 标记之间的内容由脚本生成，不要手动编辑。
+
+当 `.claude-plugin/marketplace.json`、`agents/` 或 `skills/` 发生变化时，运行：
 
 ```bash
-python scripts/sync_agents_table.py update
+python3 scripts/sync_agents_table.py update
 ```
 
-Other useful subcommands:
+其他子命令：
 
-- `generate` — print the expected table to stdout (no files touched)
-- `check` — verify the table matches what the packs declare; exits non-zero on mismatch
+- `generate`：输出期望表格，不修改文件
+- `check`：检查 README 表格是否同步
 
-CI (`.github/workflows/verify.yml`) runs `python3 scripts/verify.py` on marketplace-related changes, and fails the build if the generated README table or manifests drift.
+## 本地验证
 
-## Local verification
-
-Before publishing marketplace changes, run the repository verifier:
+发布或提交前运行：
 
 ```bash
+python3 -m unittest scripts/test_verify.py
 python3 scripts/verify.py
 ```
 
-It validates JSON manifests, plugin content structure, skill reference links, the README routing guides, and the generated README contents table.
+验证内容包括：
 
-## License
+- JSON 清单是否有效
+- 市场中的本地能力包来源是否存在
+- 市场入口、能力包目录与插件清单中的名称是否一致
+- MCP 配置路径是否存在且不越出能力包目录
+- 代理、命令、技能基本结构是否符合约定
+- 技能参考链接是否存在且不越界
+- 代理正文中引用的同包技能是否存在
+- README 中代理/技能路由表是否完整
+- README 自动生成表是否同步
+- 仓库中是否存在已知格式的明文访问 token
+
+## 维护边界
+
+- 不要把业务项目代码放进这个仓库。
+- 不要把临时说明、安装草稿、一次性文档放进技能目录。
+- 不要为了一个普通技能新增代理，除非任务确实需要独立角色或长流程。
+- 不要在不同能力包中复制相同技能，优先复用或移动到更通用的能力包。
+- 引入第三方技能时，保留来源、许可和必要版权说明。
+
+## 许可证
 
 MIT.

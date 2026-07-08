@@ -6,6 +6,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +14,11 @@ MARKETPLACE = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 PLUGINS_DIR = REPO_ROOT / "plugins"
 SYNC_SCRIPT = REPO_ROOT / "scripts" / "sync_agents_table.py"
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\((reference(?:s)?/[^)#]+\.md)(?:#[^)]+)?\)")
+AGENT_SKILL_LINK_RE = re.compile(r"`([a-z0-9][a-z0-9-]*)`\s*技能")
+SECRET_PATTERNS = (
+    ("Apifox access token", re.compile(r"\bafxp_[A-Za-z0-9]{12,}\b")),
+)
+SKIPPED_SCAN_DIRS = {".git", ".cache", "node_modules"}
 
 
 def load_json(path: Path) -> object:
@@ -33,6 +39,61 @@ def read_text(path: Path) -> str:
         raise RuntimeError(f"cannot read {path.relative_to(REPO_ROOT)}: {error}") from error
 
 
+def verify_no_plaintext_secrets() -> None:
+    for path in sorted(REPO_ROOT.rglob("*")):
+        if not path.is_file() or SKIPPED_SCAN_DIRS.intersection(path.relative_to(REPO_ROOT).parts):
+            continue
+
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        except OSError as error:
+            raise RuntimeError(f"cannot scan {path.relative_to(REPO_ROOT)}: {error}") from error
+
+        for label, pattern in SECRET_PATTERNS:
+            if pattern.search(text):
+                raise RuntimeError(f"{path.relative_to(REPO_ROOT)} contains plaintext secret: {label}")
+
+    print("ok: no plaintext secrets detected")
+
+
+def verify_plugin_manifest(plugin_dir: Path, expected_name: Optional[str] = None) -> dict:
+    manifest = load_json(plugin_dir / ".claude-plugin" / "plugin.json")
+    if not isinstance(manifest, dict):
+        raise RuntimeError(f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} must contain a JSON object")
+
+    actual_name = manifest.get("name")
+    if not isinstance(actual_name, str) or not actual_name:
+        raise RuntimeError(f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} missing plugin name")
+
+    if actual_name != plugin_dir.name:
+        raise RuntimeError(
+            f"plugin manifest name mismatch: {plugin_dir.relative_to(REPO_ROOT)} declares `{actual_name}`"
+        )
+    if expected_name is not None and actual_name != expected_name:
+        raise RuntimeError(
+            f"plugin manifest name mismatch: marketplace declares `{expected_name}` but manifest declares `{actual_name}`"
+        )
+
+    mcp_servers = manifest.get("mcpServers")
+    if mcp_servers is not None:
+        if not isinstance(mcp_servers, str) or not mcp_servers:
+            raise RuntimeError(f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} mcpServers must be a path string")
+
+        mcp_path = (plugin_dir / mcp_servers).resolve()
+        try:
+            mcp_path.relative_to(plugin_dir)
+        except ValueError as error:
+            raise RuntimeError(
+                f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} mcpServers path escapes plugin directory"
+            ) from error
+        if not mcp_path.is_file():
+            raise RuntimeError(f"mcpServers file does not exist: {mcp_path.relative_to(REPO_ROOT)}")
+
+    return manifest
+
+
 def verify_json_manifests() -> None:
     marketplace = load_json(MARKETPLACE)
     if not isinstance(marketplace, dict):
@@ -46,6 +107,10 @@ def verify_json_manifests() -> None:
         if not isinstance(plugin, dict):
             raise RuntimeError("each marketplace plugin entry must be a JSON object")
 
+        plugin_name = plugin.get("name")
+        if not isinstance(plugin_name, str) or not plugin_name:
+            raise RuntimeError("each marketplace plugin entry must define a non-empty name")
+
         source = plugin.get("source")
         if not isinstance(source, str) or not source.startswith("./plugins/"):
             continue
@@ -56,10 +121,10 @@ def verify_json_manifests() -> None:
         except ValueError as error:
             raise RuntimeError(f"plugin source escapes repository: {source}") from error
 
-        load_json(plugin_dir / ".claude-plugin" / "plugin.json")
+        verify_plugin_manifest(plugin_dir, plugin_name)
 
     for manifest in sorted(PLUGINS_DIR.glob("*/.claude-plugin/plugin.json")):
-        load_json(manifest)
+        verify_plugin_manifest(manifest.parents[1])
 
     print("ok: json manifests are valid")
 
@@ -141,6 +206,30 @@ def verify_skill_references() -> None:
     print("ok: skill references are valid")
 
 
+def local_skill_names(plugin_dir: Path) -> set[str]:
+    return {
+        parse_frontmatter(skill).get("name", "")
+        for skill in sorted((plugin_dir / "skills").glob("*/SKILL.md"))
+    } - {""}
+
+
+def verify_agent_skill_links() -> None:
+    for agent in sorted(PLUGINS_DIR.glob("*/agents/*.md")):
+        plugin_dir = agent.parents[1]
+        skill_names = local_skill_names(plugin_dir)
+        text = read_text(agent)
+        body_start = text.find("\n---", 4)
+        body = text[body_start + 4 :] if body_start != -1 else text
+
+        for skill_name in sorted(set(AGENT_SKILL_LINK_RE.findall(body))):
+            if skill_name not in skill_names:
+                raise RuntimeError(
+                    f"{agent.relative_to(REPO_ROOT)} unknown skill reference: `{skill_name}`"
+                )
+
+    print("ok: agent skill links are valid")
+
+
 def read_readme_table_names(heading: str, label: str) -> set[str]:
     readme = read_text(REPO_ROOT / "README.md")
     start = readme.find(heading)
@@ -179,7 +268,7 @@ def verify_agent_routing_guide() -> None:
     }
     expected_names.discard("")
 
-    actual_names = read_readme_table_names("## Choosing an agent", "Agent")
+    actual_names = read_readme_table_names("## 选择代理", "代理")
     missing = sorted(expected_names - actual_names)
     unknown = sorted(actual_names - expected_names)
 
@@ -189,7 +278,7 @@ def verify_agent_routing_guide() -> None:
             details.append(f"missing: {', '.join(missing)}")
         if unknown:
             details.append(f"unknown: {', '.join(unknown)}")
-        raise RuntimeError(f"README `Choosing an agent` table is out of sync ({'; '.join(details)})")
+        raise RuntimeError(f"README `选择代理` table is out of sync ({'; '.join(details)})")
 
     print("ok: README agent routing guide is in sync")
 
@@ -201,7 +290,7 @@ def verify_skill_routing_guide() -> None:
     }
     expected_names.discard("")
 
-    actual_names = read_readme_table_names("## Choosing a skill", "Skill")
+    actual_names = read_readme_table_names("## 选择技能", "技能")
     missing = sorted(expected_names - actual_names)
     unknown = sorted(actual_names - expected_names)
 
@@ -211,7 +300,7 @@ def verify_skill_routing_guide() -> None:
             details.append(f"missing: {', '.join(missing)}")
         if unknown:
             details.append(f"unknown: {', '.join(unknown)}")
-        raise RuntimeError(f"README `Choosing a skill` table is out of sync ({'; '.join(details)})")
+        raise RuntimeError(f"README `选择技能` table is out of sync ({'; '.join(details)})")
 
     print("ok: README skill routing guide is in sync")
 
@@ -233,9 +322,11 @@ def verify_agents_table() -> None:
 
 def main() -> int:
     try:
+        verify_no_plaintext_secrets()
         verify_json_manifests()
         verify_plugin_content()
         verify_skill_references()
+        verify_agent_skill_links()
         verify_agent_routing_guide()
         verify_skill_routing_guide()
         verify_agents_table()

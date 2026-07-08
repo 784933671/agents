@@ -300,12 +300,20 @@ def pluralize(n, word):
     return f"{n} {word}{'s' if n != 1 else ''}"
 
 
+def category_label(category):
+    labels = {
+        "design": "设计",
+        "development": "开发",
+    }
+    return labels.get(category, category)
+
+
 def build_table(plugins):
-    lines = ["| Pack | Category | Agents | Skills |", "|------|----------|--------|--------|"]
+    lines = ["| 能力包 | 分类 | 代理 | 技能 |", "|--------|------|------|------|"]
     total_agents = 0
     total_skills = 0
     for p in plugins:
-        category = p.get("category", "")
+        category = category_label(p.get("category", ""))
         agents = agents_for_pack(p)
         skills = skills_for_pack(p)
         if not agents and not skills:
@@ -316,10 +324,7 @@ def build_table(plugins):
         skills_str = ", ".join(skills) if skills else "_(none)_"
         lines.append(f"| `{p['name']}` | {category} | {agents_str} | {skills_str} |")
     lines.append("")
-    lines.append(
-        f"Total: **{pluralize(len(plugins), 'pack')}, "
-        f"{pluralize(total_agents, 'agent')}, {pluralize(total_skills, 'skill')}**."
-    )
+    lines.append(f"总计：**{len(plugins)} 个能力包，{total_agents} 个代理，{total_skills} 个技能**。")
     return "\n".join(lines)
 
 

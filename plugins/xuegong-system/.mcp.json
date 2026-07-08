@@ -9,7 +9,7 @@
         "--project-id=7802011"
       ],
       "env": {
-        "APIFOX_ACCESS_TOKEN": "afxp_cbbb0fOBqksF1RHulmafMIEqLKRuyoMMNj4O"
+        "APIFOX_ACCESS_TOKEN": ""
       }
     }
   }
