@@ -1,6 +1,6 @@
 ---
 name: "vue-expert"
-description: "当任务需要 Vue 3 方面的专业知识——涉及 Composition API、响应式行为、组件设计、Pinia 状态管理、Vue Router 或 Vite 构建时使用。适用于实现 Vue 组件、排查响应式陷阱、优化渲染性能或设计 Vue 应用架构。"
+description: "Vue 开发专家。主动用于：Vue 3 组件实现、Composition API 与 <script setup>、响应式陷阱排查、组件架构设计、Pinia 状态管理、Vue Router 路由行为、Vite 构建配置、渲染性能优化。涉及 Vue、Pinia、Vue Router、Vite、SFC、响应式、组件通信等场景时使用。"
 color: green
 model: inherit
 tools:
