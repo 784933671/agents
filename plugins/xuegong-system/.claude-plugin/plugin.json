@@ -1,5 +1,14 @@
 {
   "name": "xuegong-system",
   "description": "学工系统 Apifox MCP 接入。",
-  "mcpServers": "./.mcp.json"
+  "mcpServers": "./.mcp.json",
+  "userConfig": {
+    "apifox_access_token": {
+      "type": "string",
+      "description": "Apifox 访问令牌（APIFOX_ACCESS_TOKEN）。在 Apifox → 个人设置 → API 访问令牌中生成，需要目标项目的读取权限。",
+      "default": "",
+      "required": true,
+      "sensitive": true
+    }
+  }
 }

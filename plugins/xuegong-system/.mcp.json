@@ -9,7 +9,7 @@
         "--project-id=7802011"
       ],
       "env": {
-        "APIFOX_ACCESS_TOKEN": ""
+        "APIFOX_ACCESS_TOKEN": "${user_config.apifox_access_token}"
       }
     }
   }
