@@ -87,7 +87,7 @@ Before publishing marketplace changes, run the repository verifier:
 python3 scripts/verify.py
 ```
 
-It validates JSON manifests and checks that the generated README agents table matches the marketplace.
+It validates JSON manifests, plugin content structure, the README routing guide in `Choosing an agent`, and the generated README agents table.
 
 ## License
 

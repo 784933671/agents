@@ -120,6 +120,60 @@ def verify_plugin_content() -> None:
     print("ok: plugin content structure is valid")
 
 
+def read_choosing_agent_table_names() -> set[str]:
+    readme = read_text(REPO_ROOT / "README.md")
+    heading = "## Choosing an agent"
+    start = readme.find(heading)
+    if start == -1:
+        raise RuntimeError("README missing `Choosing an agent` section")
+
+    section = readme[start + len(heading) :]
+    next_heading = section.find("\n## ")
+    if next_heading != -1:
+        section = section[:next_heading]
+
+    names: set[str] = set()
+    for line in section.splitlines():
+        stripped = line.strip()
+        if not stripped.startswith("|"):
+            continue
+
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if len(cells) < 2 or cells[0] == "Agent" or set(cells[0]) <= {"-", ":"}:
+            continue
+
+        agent = cells[0].strip("`")
+        if agent:
+            names.add(agent)
+
+    if not names:
+        raise RuntimeError("README `Choosing an agent` table has no agent rows")
+
+    return names
+
+
+def verify_agent_routing_guide() -> None:
+    expected_names = {
+        parse_frontmatter(agent).get("name", "")
+        for agent in sorted(PLUGINS_DIR.glob("*/agents/*.md"))
+    }
+    expected_names.discard("")
+
+    actual_names = read_choosing_agent_table_names()
+    missing = sorted(expected_names - actual_names)
+    unknown = sorted(actual_names - expected_names)
+
+    if missing or unknown:
+        details = []
+        if missing:
+            details.append(f"missing: {', '.join(missing)}")
+        if unknown:
+            details.append(f"unknown: {', '.join(unknown)}")
+        raise RuntimeError(f"README `Choosing an agent` table is out of sync ({'; '.join(details)})")
+
+    print("ok: README agent routing guide is in sync")
+
+
 def verify_agents_table() -> None:
     result = subprocess.run(
         [sys.executable, str(SYNC_SCRIPT), "check"],
@@ -139,6 +193,7 @@ def main() -> int:
     try:
         verify_json_manifests()
         verify_plugin_content()
+        verify_agent_routing_guide()
         verify_agents_table()
     except RuntimeError as error:
         print(f"error: {error}", file=sys.stderr)
