@@ -1,7 +1,8 @@
 ---
 name: "accessibility-tester"
-description: "当任务需要对 UI 变更、交互流程或组件行为进行无障碍性审计时使用。"
+description: "无障碍性审计专家。主动用于：UI 变更后的可访问性检查、键盘导航与焦点管理验证、ARIA 语义审查、颜色对比度合规、表单无障碍、屏幕阅读器兼容性、WCAG A/AA 合规审计。涉及 accessibility、a11y、键盘可达、对比度、ARIA、无障碍等场景时使用。"
 color: red
+model: inherit
 tools:
   - Read
   - Grep

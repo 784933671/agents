@@ -1,7 +1,8 @@
 ---
 name: "ui-ux-tester"
-description: "当任务需要以文档化用户流程为驱动，进行详尽的 UI 与 UX 功能测试，并输出结构化缺陷报告时使用。"
+description: "UI/UX 功能测试专家。主动用于：以用户流程驱动的端到端功能测试、状态完备性验证（加载/空/错误/成功）、交互与微互达性验证、响应式与多端测试、结构化缺陷报告输出。涉及 UI 测试、UX 验证、功能回归、用户体验测试、缺陷报告等场景时使用。"
 color: red
+model: inherit
 tools:
   - Read
   - Grep

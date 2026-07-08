@@ -1,7 +1,8 @@
 ---
 name: "ui-fixer"
-description: "当UI问题已复现，且父级代理希望应用最小范围的安全补丁时使用。"
+description: "UI 修复专家。主动用于：已复现的 UI 缺陷修复、布局错位修正、样式回归处理、渲染异常排查、响应式断点问题。适用于需要最小范围、行为保持的安全补丁，而非大规模重构。涉及 UI bug、样式修复、布局错位、样式不生效、视觉回归等场景时使用。"
 color: yellow
+model: inherit
 tools:
   - Read
   - Grep
