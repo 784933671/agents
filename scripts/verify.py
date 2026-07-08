@@ -24,6 +24,13 @@ def load_json(path: Path) -> object:
         raise RuntimeError(f"invalid JSON in {rel_path}: {error}") from error
 
 
+def read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise RuntimeError(f"cannot read {path.relative_to(REPO_ROOT)}: {error}") from error
+
+
 def verify_json_manifests() -> None:
     marketplace = load_json(MARKETPLACE)
     if not isinstance(marketplace, dict):
@@ -56,10 +63,7 @@ def verify_json_manifests() -> None:
 
 
 def parse_frontmatter(path: Path) -> dict:
-    try:
-        text = path.read_text(encoding="utf-8")
-    except OSError as error:
-        raise RuntimeError(f"cannot read {path.relative_to(REPO_ROOT)}: {error}") from error
+    text = read_text(path)
 
     if not text.startswith("---\n"):
         raise RuntimeError(f"missing frontmatter: {path.relative_to(REPO_ROOT)}")
@@ -105,7 +109,7 @@ def verify_plugin_content() -> None:
             raise RuntimeError(f"{rel_path} frontmatter name must match filename stem")
 
     for command in sorted(PLUGINS_DIR.glob("*/commands/*.md")):
-        text = command.read_text(encoding="utf-8")
+        text = read_text(command)
         if "$ARGUMENTS" not in text:
             raise RuntimeError(f"{command.relative_to(REPO_ROOT)} must contain $ARGUMENTS")
 
