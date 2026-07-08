@@ -55,6 +55,67 @@ def verify_json_manifests() -> None:
     print("ok: json manifests are valid")
 
 
+def parse_frontmatter(path: Path) -> dict:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise RuntimeError(f"cannot read {path.relative_to(REPO_ROOT)}: {error}") from error
+
+    if not text.startswith("---\n"):
+        raise RuntimeError(f"missing frontmatter: {path.relative_to(REPO_ROOT)}")
+
+    end = text.find("\n---", 4)
+    if end == -1:
+        raise RuntimeError(f"unterminated frontmatter: {path.relative_to(REPO_ROOT)}")
+
+    fields = {}
+    for line in text[4:end].splitlines():
+        if ":" not in line or line.startswith(" "):
+            continue
+        key, value = line.split(":", 1)
+        fields[key.strip()] = value.strip().strip("\"'")
+    return fields
+
+
+def require_fields(path: Path, fields: dict, required: tuple[str, ...]) -> None:
+    missing = [field for field in required if not fields.get(field)]
+    if missing:
+        rel_path = path.relative_to(REPO_ROOT)
+        raise RuntimeError(f"{rel_path} missing frontmatter field(s): {', '.join(missing)}")
+
+
+def verify_plugin_content() -> None:
+    marketplace = load_json(MARKETPLACE)
+    plugins = marketplace.get("plugins", []) if isinstance(marketplace, dict) else []
+
+    for plugin in plugins:
+        if not isinstance(plugin, dict):
+            continue
+        source = plugin.get("source")
+        if isinstance(source, str) and source.startswith("./plugins/"):
+            plugin_dir = (REPO_ROOT / source).resolve()
+            if not plugin_dir.is_dir():
+                raise RuntimeError(f"plugin source does not exist: {source}")
+
+    for agent in sorted(PLUGINS_DIR.glob("*/agents/*.md")):
+        fields = parse_frontmatter(agent)
+        require_fields(agent, fields, ("name", "description", "model"))
+        if fields["name"] != agent.stem:
+            rel_path = agent.relative_to(REPO_ROOT)
+            raise RuntimeError(f"{rel_path} frontmatter name must match filename stem")
+
+    for command in sorted(PLUGINS_DIR.glob("*/commands/*.md")):
+        text = command.read_text(encoding="utf-8")
+        if "$ARGUMENTS" not in text:
+            raise RuntimeError(f"{command.relative_to(REPO_ROOT)} must contain $ARGUMENTS")
+
+    for skill in sorted(PLUGINS_DIR.glob("*/skills/*/SKILL.md")):
+        fields = parse_frontmatter(skill)
+        require_fields(skill, fields, ("name", "description"))
+
+    print("ok: plugin content structure is valid")
+
+
 def verify_agents_table() -> None:
     result = subprocess.run(
         [sys.executable, str(SYNC_SCRIPT), "check"],
@@ -73,6 +134,7 @@ def verify_agents_table() -> None:
 def main() -> int:
     try:
         verify_json_manifests()
+        verify_plugin_content()
         verify_agents_table()
     except RuntimeError as error:
         print(f"error: {error}", file=sys.stderr)
