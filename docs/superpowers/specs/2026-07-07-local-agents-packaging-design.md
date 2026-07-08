@@ -1,3 +1,5 @@
+> **历史设计说明**: 本文记录 2026-07-07 的初始打包方案。当前仓库已精简为 `ui-ux-craft` 与 `vue-development` 两个本地插件包，不再保留本文中的四包方案或上游包共存方案。
+
 # 本地子智能体打包上传设计
 
 **日期**: 2026-07-07
@@ -88,3 +90,12 @@ agents/
 ## 发布
 
 打包完成后提示用户执行 `git add/commit/push`,不自动 push(对外发布需用户确认)。
+
+## 当前实现状态
+
+截至 2026-07-08，仓库实际维护两个本地插件包:
+
+- `ui-ux-craft`: UI/UX 设计、走查、修复与无障碍审计
+- `vue-development`: Vue 3 / Composition API / Pinia / Vue Router / Vite 开发辅助
+
+后续维护以 `.claude-plugin/marketplace.json` 和 README 中的 generated agents table 为准。

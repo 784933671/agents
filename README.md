@@ -69,6 +69,16 @@ Other useful subcommands:
 
 CI (`.github/workflows/verify-agents-table.yml`) runs `check` on changes to `marketplace.json`, `README.md`, or the script itself, and fails the build if the table drifts.
 
+## Local verification
+
+Before publishing marketplace changes, run the repository verifier:
+
+```bash
+python3 scripts/verify.py
+```
+
+It validates JSON manifests and checks that the generated README agents table matches the marketplace.
+
 ## License
 
 MIT.
