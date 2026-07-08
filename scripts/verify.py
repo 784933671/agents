@@ -2,6 +2,7 @@
 """Run repository checks before publishing plugin marketplace changes."""
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -11,6 +12,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 MARKETPLACE = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 PLUGINS_DIR = REPO_ROOT / "plugins"
 SYNC_SCRIPT = REPO_ROOT / "scripts" / "sync_agents_table.py"
+MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\((reference(?:s)?/[^)#]+\.md)(?:#[^)]+)?\)")
 
 
 def load_json(path: Path) -> object:
@@ -120,12 +122,30 @@ def verify_plugin_content() -> None:
     print("ok: plugin content structure is valid")
 
 
-def read_choosing_agent_table_names() -> set[str]:
+def verify_skill_references() -> None:
+    for skill in sorted(PLUGINS_DIR.glob("*/skills/*/SKILL.md")):
+        text = read_text(skill)
+        skill_dir = skill.parent
+        for match in MARKDOWN_LINK_RE.finditer(text):
+            link = match.group(1)
+            target = (skill_dir / link).resolve()
+            try:
+                target.relative_to(skill_dir)
+            except ValueError as error:
+                rel_path = skill.relative_to(REPO_ROOT)
+                raise RuntimeError(f"{rel_path} reference escapes skill directory: {link}") from error
+            if not target.is_file():
+                rel_path = skill.relative_to(REPO_ROOT)
+                raise RuntimeError(f"{rel_path} missing skill reference: {link}")
+
+    print("ok: skill references are valid")
+
+
+def read_readme_table_names(heading: str, label: str) -> set[str]:
     readme = read_text(REPO_ROOT / "README.md")
-    heading = "## Choosing an agent"
     start = readme.find(heading)
     if start == -1:
-        raise RuntimeError("README missing `Choosing an agent` section")
+        raise RuntimeError(f"README missing `{heading.removeprefix('## ')}` section")
 
     section = readme[start + len(heading) :]
     next_heading = section.find("\n## ")
@@ -139,15 +159,15 @@ def read_choosing_agent_table_names() -> set[str]:
             continue
 
         cells = [cell.strip() for cell in stripped.strip("|").split("|")]
-        if len(cells) < 2 or cells[0] == "Agent" or set(cells[0]) <= {"-", ":"}:
+        if len(cells) < 2 or cells[0] == label or set(cells[0]) <= {"-", ":"}:
             continue
 
-        agent = cells[0].strip("`")
-        if agent:
-            names.add(agent)
+        name = cells[0].strip("`")
+        if name:
+            names.add(name)
 
     if not names:
-        raise RuntimeError("README `Choosing an agent` table has no agent rows")
+        raise RuntimeError(f"README `{heading.removeprefix('## ')}` table has no {label.lower()} rows")
 
     return names
 
@@ -159,7 +179,7 @@ def verify_agent_routing_guide() -> None:
     }
     expected_names.discard("")
 
-    actual_names = read_choosing_agent_table_names()
+    actual_names = read_readme_table_names("## Choosing an agent", "Agent")
     missing = sorted(expected_names - actual_names)
     unknown = sorted(actual_names - expected_names)
 
@@ -172,6 +192,28 @@ def verify_agent_routing_guide() -> None:
         raise RuntimeError(f"README `Choosing an agent` table is out of sync ({'; '.join(details)})")
 
     print("ok: README agent routing guide is in sync")
+
+
+def verify_skill_routing_guide() -> None:
+    expected_names = {
+        parse_frontmatter(skill).get("name", "")
+        for skill in sorted(PLUGINS_DIR.glob("*/skills/*/SKILL.md"))
+    }
+    expected_names.discard("")
+
+    actual_names = read_readme_table_names("## Choosing a skill", "Skill")
+    missing = sorted(expected_names - actual_names)
+    unknown = sorted(actual_names - expected_names)
+
+    if missing or unknown:
+        details = []
+        if missing:
+            details.append(f"missing: {', '.join(missing)}")
+        if unknown:
+            details.append(f"unknown: {', '.join(unknown)}")
+        raise RuntimeError(f"README `Choosing a skill` table is out of sync ({'; '.join(details)})")
+
+    print("ok: README skill routing guide is in sync")
 
 
 def verify_agents_table() -> None:
@@ -193,7 +235,9 @@ def main() -> int:
     try:
         verify_json_manifests()
         verify_plugin_content()
+        verify_skill_references()
         verify_agent_routing_guide()
+        verify_skill_routing_guide()
         verify_agents_table()
     except RuntimeError as error:
         print(f"error: {error}", file=sys.stderr)

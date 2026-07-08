@@ -26,6 +26,21 @@ Total: **2 packs, 5 agents**.
 | `accessibility-tester` | You need keyboard, focus, ARIA, contrast, screen reader, or WCAG A/AA review. |
 | `vue-expert` | You need Vue 3, Composition API, Pinia, Vue Router, Vite, SFC, reactivity, or component architecture help. |
 
+## Choosing a skill
+
+Use skills for focused knowledge, API patterns, and lightweight guidance. Use agents when the task needs a larger audit, repair, or test workflow.
+
+| Skill | Use when |
+|-------|----------|
+| `vue` | You need Vue API, SFC, reactivity, lifecycle, watcher, or `<script setup>` guidance. |
+| `vue-best-practices` | You need Vue architecture, component boundaries, data flow, composables, or implementation standards. |
+| `pinia` | You need store design, state/getters/actions, SSR, HMR, or testing guidance. |
+| `vue-router-best-practices` | You need route guard, route params, redirect loop, or route lifecycle guidance. |
+| `vite` | You need Vite config, plugin, build, SSR, environment, or Rolldown migration guidance. |
+| `wcag-essentials` | You need WCAG A/AA, ARIA, keyboard, focus, contrast, or accessible component guidance. |
+| `ui-fix-playbook` | You need UI defect triage, root cause isolation, minimal repair, or regression verification guidance. |
+| `ux-test-design` | You need user-flow test design, state coverage, test cases, or defect report structure. |
+
 ## Install in ZCode / Claude Code
 
 1. Open your client's plugin marketplace settings.
@@ -87,7 +102,7 @@ Before publishing marketplace changes, run the repository verifier:
 python3 scripts/verify.py
 ```
 
-It validates JSON manifests, plugin content structure, the README routing guide in `Choosing an agent`, and the generated README agents table.
+It validates JSON manifests, plugin content structure, skill reference links, the README routing guides, and the generated README agents table.
 
 ## License
 
