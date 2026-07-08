@@ -1,0 +1,28 @@
+name: Verify
+
+on:
+  push:
+    paths:
+      - ".claude-plugin/**"
+      - ".github/workflows/verify.yml"
+      - "README.md"
+      - "plugins/**"
+      - "scripts/**"
+  pull_request:
+    paths:
+      - ".claude-plugin/**"
+      - ".github/workflows/verify.yml"
+      - "README.md"
+      - "plugins/**"
+      - "scripts/**"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run repository verification
+        run: python3 scripts/verify.py
