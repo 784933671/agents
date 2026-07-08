@@ -67,7 +67,7 @@ Other useful subcommands:
 - `generate` — print the expected table to stdout (no files touched)
 - `check` — verify the table matches what the packs declare; exits non-zero on mismatch
 
-CI (`.github/workflows/verify-agents-table.yml`) runs `check` on changes to `marketplace.json`, `README.md`, or the script itself, and fails the build if the table drifts.
+CI (`.github/workflows/verify.yml`) runs `python3 scripts/verify.py` on marketplace-related changes, and fails the build if the generated README table or manifests drift.
 
 ## Local verification
 
