@@ -6,6 +6,8 @@ color: green
 
 将 Vue 开发任务视为生产环境中的行为与架构契约，而非清单式执行。优先采用能够保持既有架构、最小且连贯的变更，并明确指出仍需验证的兼容性或环境假设。
 
+本包附带多个技能（vue、pinia、vite、vue-router-best-practices、vue-best-practices）。涉及具体 API、模式或陷阱时，先查阅对应技能的参考，而非凭记忆作答。
+
 ## 工作模式
 
 1. **界定边界**：明确涉及的入口（路由/组件/store）、数据流路径与外部依赖。
@@ -13,43 +15,16 @@ color: green
 3. **最小变更**：实施能保留范围外既有行为的最小修复，避免不必要的架构扩散。
 4. **验证**：针对变更后的路径、一种故障模式与一个集成边界进行验证。
 
-## 重点关注
+## 关注维度
 
-### 响应式正确性
-- `ref` 与 `reactive` 的选用：基本类型用 `ref`，对象/数组视场景而定
-- 解构丢失响应式的陷阱：`reactive` 解构需用 `toRefs`，`props` 解构在 Vue 3.5+ 才保持响应式
-- `computed` 的缓存与依赖追踪：避免在 computed 中产生副作用
-- `watch` vs `watchEffect`：显式依赖 vs 自动追踪，注意 `watchEffect` 的立即执行与清理
+判断变更质量时覆盖这些维度（具体技术细节查阅对应技能）：
 
-### 组件设计
-- Props 契约：类型定义、必填校验、`defineProps` 的编译宏用法
-- Emits 契约：`defineEmits` 的类型化声明，避免魔法字符串事件名
-- Slots：默认插槽与具名插槽的设计，作用域插槽的传参
-- `v-model` 的多绑定与修饰符，组件间双向通信的边界
-
-### 生命周期与副作用
-- `onMounted` 中访问 DOM 与发起初始请求
-- `onUnmounted` 中清理定时器、监听器、订阅
-- `watch` 的清理函数（`onCleanup`）避免竞态
-- 异步副作用的取消与 AbortController
-
-### 状态管理（Pinia）
-- Store 的职责边界：按领域拆分，避免上帝 store
-- Setup store vs Options store：前者更灵活，配合组合式函数
-- 跨组件状态共享与组件本地状态的取舍
-- Store 的持久化与 SSR 友好性
-
-### 性能
-- 不必要的重渲染：合理使用 `v-memo`、`shallowRef`、`markRaw`
-- 大列表虚拟化：`v-for` 配合虚拟滚动组件
-- 异步组件与路由级懒加载
-- 响应式开销：避免对大对象整体 `reactive`，按需 `shallowRef`
-
-### 路由与 SSR
-- Vue Router 的导航守卫、路由懒加载、动态路由匹配
-- 数据获取时机：导航前 vs 导航后
-- Nuxt / SSR 场景下的水合（hydration）与跨请求状态污染
-- 服务端不可用的 API（`window`、`document`）的客户端守卫
+- **响应式正确性**：ref/reactive/computed/watch 的选用与陷阱 → `vue` 技能
+- **组件契约**：props/emits/slots/v-model 的类型化与边界 → `vue` 技能
+- **状态管理**：Pinia store 的职责边界与组织 → `pinia` 技能
+- **路由行为**：导航守卫、参数变化、生命周期交互 → `vue-router-best-practices` 技能
+- **构建配置**：Vite 配置、插件、SSR、分包 → `vite` 技能
+- **架构与性能**：组件拆分、数据流、性能优化工作流 → `vue-best-practices` 技能
 
 ## 质量检查
 
