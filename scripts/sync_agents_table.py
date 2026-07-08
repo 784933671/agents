@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Keep README's agents table in sync with marketplace.json.
+"""Keep README's plugin contents table in sync with marketplace.json.
 
 Subcommands:
   check     build the expected table, compare to README, exit 1 on mismatch
   update    build the expected table, rewrite README's table block in place
   generate  build the expected table, print it to stdout
 
-For each plugin in marketplace.json, resolves the agent list by source kind:
+For each plugin in marketplace.json, resolves local agents and skills by source kind:
   git-subdir   -> GitHub Contents API at the pinned sha (set GITHUB_TOKEN
                   in CI to raise the rate limit)
   local path   -> read ./<path>/agents/ directly from this repo
@@ -101,6 +101,11 @@ def agent_name_from_md(text, fallback):
     return match.group(1) if match else fallback
 
 
+def skill_name_from_md(text, fallback):
+    """Extract the `name:` field from a skill's SKILL.md frontmatter."""
+    return agent_name_from_md(text, fallback)
+
+
 def fetch_local_agents(rel_path):
     """Return a sorted list of agent names from a vendored (directory) pack.
 
@@ -109,9 +114,12 @@ def fetch_local_agents(rel_path):
     abs_path = os.path.normpath(os.path.join(REPO_ROOT, rel_path))
     agents_dir = os.path.join(abs_path, "agents")
     if not os.path.isdir(agents_dir):
+        skills_dir = os.path.join(abs_path, "skills")
+        if os.path.isdir(skills_dir):
+            return []
         die(
             f"vendored pack has no agents/ directory: {agents_dir}\n"
-            f"  source was '{rel_path}'; does the directory exist?"
+            f"  source was '{rel_path}'; does the directory exist, or is it a skills-only pack?"
         )
     names = []
     for fname in os.listdir(agents_dir):
@@ -125,6 +133,28 @@ def fetch_local_agents(rel_path):
             names.append(stem)
             continue
         names.append(agent_name_from_md(text, stem))
+    return sorted(names)
+
+
+def fetch_local_skills(rel_path):
+    """Return a sorted list of skill names from a vendored pack."""
+    abs_path = os.path.normpath(os.path.join(REPO_ROOT, rel_path))
+    skills_dir = os.path.join(abs_path, "skills")
+    if not os.path.isdir(skills_dir):
+        return []
+
+    names = []
+    for skill_name in os.listdir(skills_dir):
+        skill_file = os.path.join(skills_dir, skill_name, "SKILL.md")
+        if not os.path.isfile(skill_file):
+            continue
+        try:
+            with open(skill_file, encoding="utf-8") as f:
+                text = f.read()
+        except OSError:
+            names.append(skill_name)
+            continue
+        names.append(skill_name_from_md(text, skill_name))
     return sorted(names)
 
 
@@ -253,24 +283,42 @@ def agents_for_pack(plugin):
     )
 
 
+def skills_for_pack(plugin):
+    """Resolve a pack's skill list for local vendored packs."""
+    source = plugin.get("source")
+    if isinstance(source, str):
+        return fetch_local_skills(source)
+    if not isinstance(source, dict):
+        return []
+    kind = source.get("source")
+    if kind in ("directory", "local"):
+        return fetch_local_skills(source["path"])
+    return []
+
+
 def pluralize(n, word):
     return f"{n} {word}{'s' if n != 1 else ''}"
 
 
 def build_table(plugins):
-    lines = ["| Pack | Category | Agents |", "|------|----------|--------|"]
+    lines = ["| Pack | Category | Agents | Skills |", "|------|----------|--------|--------|"]
     total_agents = 0
+    total_skills = 0
     for p in plugins:
         category = p.get("category", "")
         agents = agents_for_pack(p)
-        if not agents:
-            print(f"warning: pack {p['name']} has no agents", file=sys.stderr)
+        skills = skills_for_pack(p)
+        if not agents and not skills:
+            print(f"warning: pack {p['name']} has no agents or skills", file=sys.stderr)
         total_agents += len(agents)
+        total_skills += len(skills)
         agents_str = ", ".join(agents) if agents else "_(none)_"
-        lines.append(f"| `{p['name']}` | {category} | {agents_str} |")
+        skills_str = ", ".join(skills) if skills else "_(none)_"
+        lines.append(f"| `{p['name']}` | {category} | {agents_str} | {skills_str} |")
     lines.append("")
     lines.append(
-        f"Total: **{pluralize(len(plugins), 'pack')}, {pluralize(total_agents, 'agent')}**."
+        f"Total: **{pluralize(len(plugins), 'pack')}, "
+        f"{pluralize(total_agents, 'agent')}, {pluralize(total_skills, 'skill')}**."
     )
     return "\n".join(lines)
 

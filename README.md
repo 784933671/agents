@@ -1,19 +1,20 @@
 # 784933671-agents
 
-A **subagent collection** for ZCode / Claude Code, packaged as a plugin marketplace. One-click install gives you categorized agent packs covering UI/UX craft and Vue development — all self-hosted in this repo.
+一个面向 **ZCode / Claude Code** 的自托管 agents 与 skills 插件市场。安装后可按分类选择 UI/UX、Vue、JavaScript 和项目专用 API 能力包。
 
 ## What's inside
 
-Two vendored packs live in this marketplace, each a set of locally authored agents served directly from `plugins/`:
+本市场的所有 pack 都内置在 `plugins/` 目录下，安装时直接从仓库读取：
 
 <!-- AGENTS-TABLE:START -->
-| Pack | Category | Agents |
-|------|----------|--------|
-| `ui-ux-craft` | design | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester |
-| `vue-development` | development | vue-expert |
-| `xuegong-system` | development | xuegong-api-expert |
+| Pack | Category | Agents | Skills |
+|------|----------|--------|--------|
+| `ui-ux-craft` | design | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester | ui-fix-playbook, ux-test-design, wcag-essentials |
+| `vue-development` | development | vue-expert | pinia, vite, vue, vue-best-practices, vue-router-best-practices |
+| `javascript-development` | development | _(none)_ | javascript-pro |
+| `xuegong-system` | development | xuegong-api-expert | _(none)_ |
 
-Total: **3 packs, 6 agents**.
+Total: **4 packs, 6 agents, 9 skills**.
 
 <!-- AGENTS-TABLE:END -->
 
@@ -39,6 +40,7 @@ Use skills for focused knowledge, API patterns, and lightweight guidance. Use ag
 | `pinia` | You need store design, state/getters/actions, SSR, HMR, or testing guidance. |
 | `vue-router-best-practices` | You need route guard, route params, redirect loop, or route lifecycle guidance. |
 | `vite` | You need Vite config, plugin, build, SSR, environment, or Rolldown migration guidance. |
+| `javascript-pro` | You need modern JavaScript, async/await, ESM/CJS modules, Node.js, browser APIs, or `.js/.mjs/.cjs` review guidance. |
 | `wcag-essentials` | You need WCAG A/AA, ARIA, keyboard, focus, contrast, or accessible component guidance. |
 | `ui-fix-playbook` | You need UI defect triage, root cause isolation, minimal repair, or regression verification guidance. |
 | `ux-test-design` | You need user-flow test design, state coverage, test cases, or defect report structure. |
@@ -60,6 +62,7 @@ The client reads `.claude-plugin/marketplace.json` to discover the packs; each p
 .claude-plugin/
 └── marketplace.json     ← declares the packs
 plugins/                 ← all packs live here
+├── javascript-development/ ← JavaScript ES2023+ / async / ESM / Node.js / Browser API
 ├── ui-ux-craft/         ← UI design, fixing, UX testing, accessibility
 └── vue-development/     ← Vue 3 / Composition API / Pinia / Vite
 ```
@@ -81,9 +84,9 @@ Add new entries to the `plugins` array in `marketplace.json`. Each entry needs `
 
 ## Keeping the table in sync
 
-The agents table above (between the `AGENTS-TABLE` markers) is generated from `marketplace.json` and the resolved `agents/` directories — **don't hand-edit it**.
+The contents table above (between the `AGENTS-TABLE` markers) is generated from `marketplace.json` and the resolved `agents/` / `skills/` directories — **don't hand-edit it**.
 
-After any change to `marketplace.json` or a pack's `agents/`, refresh the table:
+After any change to `marketplace.json` or a pack's `agents/` / `skills/`, refresh the table:
 
 ```bash
 python scripts/sync_agents_table.py update
@@ -104,7 +107,7 @@ Before publishing marketplace changes, run the repository verifier:
 python3 scripts/verify.py
 ```
 
-It validates JSON manifests, plugin content structure, skill reference links, the README routing guides, and the generated README agents table.
+It validates JSON manifests, plugin content structure, skill reference links, the README routing guides, and the generated README contents table.
 
 ## License
 
