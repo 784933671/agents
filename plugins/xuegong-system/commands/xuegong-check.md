@@ -51,7 +51,7 @@ $ARGUMENTS
 - token：无效 / 过期 / 无目标项目权限
 - 下一步：
   1. 打开 **设置 → 插件管理 → 学工系统 → 配置/高级设置**
-  2. 更新 `apifox_access_token`（在 Apifox → 个人设置 → API 访问令牌生成，需 `7802011` 项目的读取权限）
+  2. 确认 `apifox_project_id` 和 `apifox_access_token` 均已填写，token 需具备目标项目读取权限
   3. 重启会话或重连 MCP，再次运行 `/xuegong:check`
 
 ### ❌ MCP 未连接
@@ -62,7 +62,7 @@ $ARGUMENTS
   2. 常见原因：
      - `command not found` / `spawn npx ENOENT` → `npx` 不在 PATH，改用绝对路径
      - `timed out` → 启动慢，在 MCP 配置加 `timeoutMs`
-     - 模板未展开（`${user_config.apifox_access_token}` 原样出现在日志）→ 插件未正确加载配置，去插件配置确认已填 token
+     - 模板未展开（`${user_config.apifox_project_id}` 或 `${user_config.apifox_access_token}` 原样出现在日志）→ 插件未正确加载配置，去插件配置确认已填写项目 ID 和 token
      - `enabled: false` → 启用该服务器
   3. 修复后重启会话，再次运行 `/xuegong:check`
 

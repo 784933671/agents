@@ -1,4 +1,19 @@
 {
   "name": "ui-ux-craft",
-  "description": "UI design, UI fixing, UX functional testing, and accessibility auditing."
+  "displayName": "UI/UX Craft",
+  "version": "1.0.0",
+  "description": "UI design, UI fixing, UX functional testing, and accessibility auditing.",
+  "author": {
+    "name": "tangtao",
+    "url": "https://github.com/784933671"
+  },
+  "repository": "https://github.com/784933671/agents",
+  "license": "MIT",
+  "keywords": [
+    "ui",
+    "ux",
+    "design",
+    "accessibility",
+    "testing"
+  ]
 }

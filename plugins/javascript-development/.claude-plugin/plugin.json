@@ -1,4 +1,19 @@
 {
   "name": "javascript-development",
-  "description": "JavaScript ES2023+ / async-await / ESM / Node.js / Browser API 专家，覆盖现代 JS 开发、调试与重构。"
+  "displayName": "JavaScript Development",
+  "version": "1.0.0",
+  "description": "JavaScript ES2023+ / async-await / ESM / Node.js / Browser API 专家，覆盖现代 JS 开发、调试与重构。",
+  "author": {
+    "name": "tangtao",
+    "url": "https://github.com/784933671"
+  },
+  "repository": "https://github.com/784933671/agents",
+  "license": "MIT",
+  "keywords": [
+    "javascript",
+    "nodejs",
+    "esm",
+    "browser-api",
+    "frontend"
+  ]
 }

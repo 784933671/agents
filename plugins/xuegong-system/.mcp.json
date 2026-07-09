@@ -6,7 +6,7 @@
       "args": [
         "-y",
         "apifox-mcp-server@latest",
-        "--project-id=7802011"
+        "--project-id=${user_config.apifox_project_id}"
       ],
       "env": {
         "APIFOX_ACCESS_TOKEN": "${user_config.apifox_access_token}"

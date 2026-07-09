@@ -1,12 +1,32 @@
 {
   "name": "xuegong-system",
+  "displayName": "学工系统",
+  "version": "1.1.0",
   "description": "学工系统 Apifox MCP 接入。",
+  "author": {
+    "name": "tangtao",
+    "url": "https://github.com/784933671"
+  },
+  "repository": "https://github.com/784933671/agents",
+  "license": "MIT",
+  "keywords": [
+    "xuegong",
+    "apifox",
+    "mcp",
+    "api",
+    "student-system"
+  ],
   "mcpServers": "./.mcp.json",
   "userConfig": {
+    "apifox_project_id": {
+      "type": "string",
+      "default": "7802011",
+      "description": "Apifox 项目 ID。"
+    },
     "apifox_access_token": {
       "type": "string",
       "default": "",
-      "description": "Apifox 访问令牌（APIFOX_ACCESS_TOKEN）。在 Apifox → 个人设置 → API 访问令牌中生成，需要目标项目（7802011）的读取权限。"
+      "description": "Apifox 访问令牌（APIFOX_ACCESS_TOKEN）。在 Apifox → 个人设置 → API 访问令牌中生成，需要目标项目的读取权限。"
     }
   }
 }
