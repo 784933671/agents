@@ -1,6 +1,6 @@
 ---
 name: pinia
-description: Pinia 是 Vue 官方状态管理库，类型安全且可扩展。适用于定义 store、使用 state/getters/actions，或在 Vue 应用中实现 store 模式时。
+description: Pinia 是 Vue 官方状态管理库，适用于定义 store、使用 state/getters/actions，或在 Vue 应用中实现 JavaScript store 模式时。
 metadata:
   author: Anthony Fu
   version: "2026.1.28"
@@ -9,7 +9,7 @@ metadata:
 
 # Pinia
 
-Pinia 是 Vue 的官方状态管理库，设计直观且类型安全。它同时支持 Options API 与 Composition API 两种风格，提供一流的 TypeScript 支持与 devtools 集成。
+Pinia 是 Vue 的官方状态管理库，设计直观。它同时支持 Options API 与 Composition API 两种风格，适合 JavaScript 项目和 devtools 调试。
 
 > 本技能基于 Pinia v3.0.4，生成于 2026-01-28。
 

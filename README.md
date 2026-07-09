@@ -37,11 +37,11 @@
 | 能力包 | 分类 | 代理 | 技能 |
 |--------|------|------|------|
 | `ui-ux-craft` | 设计 | accessibility-tester, ui-designer, ui-fixer, ui-ux-tester | ui-fix-playbook, ux-test-design, wcag-essentials |
-| `vue-development` | 开发 | vue-expert | pinia, vite, vue, vue-best-practices, vue-router-best-practices |
+| `vue-development` | 开发 | vue-expert | element-plus-forms, frontend-debugging, pinia, vant-forms, vite, vue, vue-api-integration, vue-best-practices, vue-component-design, vue-router-best-practices |
 | `javascript-development` | 开发 | _(none)_ | javascript-pro |
 | `xuegong-system` | 开发 | xuegong-api-expert | _(none)_ |
 
-总计：**4 个能力包，6 个代理，9 个技能**。
+总计：**4 个能力包，6 个代理，14 个技能**。
 
 <!-- AGENTS-TABLE:END -->
 
@@ -50,7 +50,7 @@
 | 能力包 | 适用场景 |
 |------|----------|
 | `ui-ux-craft` | UI 设计、视觉修复、交互走查、可访问性审查、用户流程测试 |
-| `vue-development` | Vue 3、Composition API、Pinia、Vue Router、Vite、SFC 和组件架构 |
+| `vue-development` | Vue 3、Composition API、Pinia、Vue Router、Vite、Element Plus、Vant、SFC 和组件架构 |
 | `javascript-development` | 现代 JavaScript、async/await、ESM/CJS、Node.js、浏览器 API、`.js/.mjs/.cjs` 审查 |
 | `xuegong-system` | 学工系统接口查询、Apifox MCP 调用、接口参数和响应结构确认 |
 
@@ -78,6 +78,11 @@
 | `pinia` | 需要 store 设计、state/getters/actions、SSR、HMR 或测试指导 |
 | `vue-router-best-practices` | 需要路由守卫、路由参数、重定向循环或路由生命周期指导 |
 | `vite` | 需要 Vite 配置、插件、构建、SSR、环境变量或 Rolldown 迁移指导 |
+| `element-plus-forms` | 需要 PC 端 Element Plus 表单、弹窗新增/编辑、动态校验或提交状态指导 |
+| `vant-forms` | 需要 H5 端 Vant 表单、验证码、Picker/Calendar 联动或移动端输入体验指导 |
+| `vue-api-integration` | 需要 Vue 接口接入、请求封装、loading/error/empty 状态或异常兜底指导 |
+| `vue-component-design` | 需要 Vue 业务组件拆分、props/emits/slots、v-model 契约或 PC/H5 组件边界指导 |
+| `frontend-debugging` | 需要 Vue、Element Plus、Vant、接口、跨域、H5 真机或线上异常定位指导 |
 | `javascript-pro` | 需要现代 JavaScript、async/await、ESM/CJS、Node.js、浏览器 API 或 `.js/.mjs/.cjs` 审查指导 |
 | `wcag-essentials` | 需要 WCAG A/AA、ARIA、键盘、焦点、对比度或无障碍组件指导 |
 | `ui-fix-playbook` | 需要 UI 缺陷定位、根因隔离、最小修复或回归验证指导 |

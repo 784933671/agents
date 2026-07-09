@@ -27,7 +27,7 @@ tools:
 判断变更质量时覆盖这些维度（具体技术细节查阅对应技能）：
 
 - **响应式正确性**：ref/reactive/computed/watch 的选用与陷阱 → `vue` 技能
-- **组件契约**：props/emits/slots/v-model 的类型化与边界 → `vue` 技能
+- **组件契约**：props/emits/slots/v-model 的显式声明与边界 → `vue` 技能
 - **状态管理**：Pinia store 的职责边界与组织 → `pinia` 技能
 - **路由行为**：导航守卫、参数变化、生命周期交互 → `vue-router-best-practices` 技能
 - **构建配置**：Vite 配置、插件、SSR、分包 → `vite` 技能

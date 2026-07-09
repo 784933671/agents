@@ -1,8 +1,8 @@
 {
   "name": "vue-development",
   "displayName": "Vue Development",
-  "version": "1.0.0",
-  "description": "Vue 3 / Composition API / Pinia / Vite 专家，覆盖组件设计、响应式系统、路由与构建优化。",
+  "version": "1.1.1",
+  "description": "Vue 3 / Composition API / Pinia / Vite 专家，覆盖组件设计、响应式系统、路由、接口接入、Element Plus 与 Vant 业务开发。",
   "author": {
     "name": "tangtao",
     "url": "https://github.com/784933671"
@@ -11,6 +11,8 @@
   "license": "MIT",
   "keywords": [
     "vue",
+    "element-plus",
+    "vant",
     "pinia",
     "vite",
     "vue-router",

@@ -1,6 +1,6 @@
 ---
 name: vue-best-practices
-description: 必须用于 Vue.js 任务。强烈推荐 Composition API 配合 `<script setup>` 与 TypeScript 作为标准方案。覆盖 Vue 3、SSR、Volar、vue-tsc。处理任何 Vue、.vue 文件、Vue Router、Pinia 或 Vite with Vue 工作时加载。除非项目明确要求 Options API，否则始终使用 Composition API。
+description: 必须用于 Vue.js 任务。强烈推荐 Composition API 配合 script setup 作为标准方案。覆盖 Vue 3、SSR、SFC、组件边界、响应式和组合式函数。处理任何 Vue、.vue 文件、Vue Router、Pinia 或 Vite with Vue 工作时加载。除非项目明确要求 Options API，否则始终使用 Composition API。
 license: MIT
 metadata:
   author: github.com/vuejs-ai
@@ -20,7 +20,7 @@ metadata:
 
 ## 1) 编码前确认架构（必需）
 
-- 默认技术栈：Vue 3 + Composition API + `<script setup lang="ts">`。
+- 默认技术栈：Vue 3 + Composition API + `<script setup>` + JavaScript。
 - 若项目明确使用 Options API，在可用时加载 `vue-options-api-best-practices` 技能。
 - 若项目明确使用 JSX，在可用时加载 `vue-jsx-best-practices` 技能。
 
@@ -41,7 +41,7 @@ metadata:
 - 默认将入口/根和路由级 view 组件保持为组合层面。
 - 将功能 UI 与功能逻辑移出入口/根/view 组件，除非任务本身就是一个小型单文件演示。
 - 在映射图中为每个子组件定义 props/emits 契约。
-- 当新增多个组件时，优先采用按功能分目录的布局（`components/<feature>/...`、`composables/use<Feature>.ts`）。
+- 当新增多个组件时，优先采用按功能分目录的布局（`components/<feature>/...`、`composables/use<Feature>.js`）。
 
 ## 2) 应用必备 Vue 基础（必需）
 
@@ -93,13 +93,13 @@ metadata:
 - 以 props 向下、events 向上作为主要模型。
 - 仅在真正的双向组件契约时使用 `v-model`。
 - 仅在深层树依赖或共享上下文时使用 provide/inject。
-- 保持契约显式且类型化，按需使用 `defineProps`、`defineEmits` 与 `InjectionKey`。
+- 保持契约显式，按需使用 `defineProps`、`defineEmits` 和 provide/inject。
 
 ### Composables
 
 - `1.1` 必读参考：[composables](references/composables.md)
 - 当逻辑被复用、有状态或副作用较重时，提取为 composables。
-- 保持 composable 的 API 小巧、类型化且可预测。
+- 保持 composable 的 API 小巧且可预测。
 - 将功能逻辑与展示组件分离。
 
 ## 3) 仅在需求出现时考虑可选特性
@@ -147,7 +147,7 @@ metadata:
 - 组件聚焦且拆分合理，按需拆分。
 - 入口/根与路由 view 组件保持为组合层面，除非有明确的小演示例外。
 - 组件拆分决策显式且站得住脚（职责边界清晰）。
-- 数据流契约显式且类型化。
+- 数据流契约显式且边界清晰。
 - 在复用/复杂度合理处使用了 composables。
 - 如适用，已将状态/副作用移入 composables。
 - 可选特性仅在需求需要时使用。

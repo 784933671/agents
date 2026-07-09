@@ -19,6 +19,9 @@ SEMVER_RE = re.compile(
     r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?(?:\+[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?$"
 )
 USER_CONFIG_REF_RE = re.compile(r"\$\{user_config\.([A-Za-z0-9_-]+)\}")
+VUE_JS_ONLY_ENTRYPOINT_RE = re.compile(
+    r"TypeScript|typescript|lang=[\"']ts[\"']|vue-tsc|vite\.config\.ts|defineProps<|defineEmits<|InjectionKey|import type"
+)
 SECRET_PATTERNS = (
     ("Apifox access token", re.compile(r"\bafxp_[A-Za-z0-9]{12,}\b")),
 )
@@ -255,6 +258,26 @@ def verify_plugin_content() -> None:
     print("ok: plugin content structure is valid")
 
 
+def verify_vue_development_entrypoints_are_js_only() -> None:
+    vue_plugin_dir = PLUGINS_DIR / "vue-development"
+    if not vue_plugin_dir.is_dir():
+        return
+
+    entrypoints = [
+        *sorted(vue_plugin_dir.glob("skills/*/SKILL.md")),
+        *sorted((vue_plugin_dir / "agents").glob("*.md")),
+        *sorted((vue_plugin_dir / "commands").glob("*.md")),
+    ]
+    for entrypoint in entrypoints:
+        match = VUE_JS_ONLY_ENTRYPOINT_RE.search(read_text(entrypoint))
+        if match:
+            raise RuntimeError(
+                f"{entrypoint.relative_to(REPO_ROOT)} contains TypeScript-oriented entrypoint text: {match.group(0)}"
+            )
+
+    print("ok: vue-development entrypoints are JavaScript-oriented")
+
+
 def verify_skill_references() -> None:
     for skill in sorted(PLUGINS_DIR.glob("*/skills/*/SKILL.md")):
         text = read_text(skill)
@@ -393,6 +416,7 @@ def main() -> int:
         verify_no_plaintext_secrets()
         verify_json_manifests()
         verify_plugin_content()
+        verify_vue_development_entrypoints_are_js_only()
         verify_skill_references()
         verify_agent_skill_links()
         verify_agent_routing_guide()

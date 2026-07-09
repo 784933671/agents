@@ -9,12 +9,12 @@ metadata:
 
 # Vue
 
-> 基于 Vue 3.5。始终使用 Composition API 配合 `<script setup lang="ts">`。
+> 基于 Vue 3.5。始终使用 Composition API 配合 `<script setup>`，按 JavaScript 项目编写。
 
 ## 偏好
 
-- 优先用 TypeScript 而非 JavaScript
-- 优先用 `<script setup lang="ts">` 而非 `<script>`
+- 优先用 JavaScript 写法，不加入类型标注
+- 优先用 `<script setup>` 而非普通 `<script>`
 - 性能上，若不需要深层响应式，优先用 `shallowRef` 而非 `ref`
 - 始终使用 Composition API 而非 Options API
 - 不鼓励使用 Reactive Props Destructure
@@ -23,7 +23,7 @@ metadata:
 
 | 主题 | 描述 | 参考 |
 |------|------|------|
-| Script Setup 与宏 | `<script setup>`、defineProps、defineEmits、defineModel、defineExpose、defineOptions、defineSlots、泛型 | [script-setup-macros](references/script-setup-macros.md) |
+| Script Setup 与宏 | `<script setup>`、defineProps、defineEmits、defineModel、defineExpose、defineOptions、defineSlots | [script-setup-macros](references/script-setup-macros.md) |
 | 响应式与生命周期 | ref、shallowRef、computed、watch、watchEffect、effectScope、生命周期钩子、composables | [core-new-apis](references/core-new-apis.md) |
 
 ## 进阶特性
@@ -37,19 +37,23 @@ metadata:
 ### 组件模板
 
 ```vue
-<script setup lang="ts">
+<script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 
-const props = defineProps<{
-  title: string
-  count?: number
-}>()
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  count: {
+    type: Number,
+    default: 0,
+  },
+})
 
-const emit = defineEmits<{
-  update: [value: string]
-}>()
+const emit = defineEmits(['update'])
 
-const model = defineModel<string>()
+const model = defineModel()
 
 const doubled = computed(() => (props.count ?? 0) * 2)
 
@@ -69,7 +73,7 @@ onMounted(() => {
 
 ### 关键导入
 
-```ts
+```js
 // 响应式
 import { ref, shallowRef, computed, reactive, readonly, toRef, toRefs, toValue } from 'vue'
 

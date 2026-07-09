@@ -1,6 +1,6 @@
 ---
 name: vite
-description: Vite 构建工具的配置、插件 API、SSR 与 Vite 8 Rolldown 迁移。适用于开发 Vite 项目、编写 vite.config.ts、Vite 插件，或用 Vite 构建库/SSR 应用时。
+description: Vite 构建工具的配置、插件 API、SSR 与 Vite 8 Rolldown 迁移。适用于开发 Vite 项目、编写 vite.config.js、Vite 插件，或用 Vite 构建库/SSR 应用时。
 metadata:
   author: Anthony Fu
   version: "2026.1.31"
@@ -15,14 +15,14 @@ Vite 是新一代前端构建工具，拥有快速的开发服务器（原生 ES
 
 ## 偏好
 
-- 使用 TypeScript：优先用 `vite.config.ts`
+- JavaScript 项目优先用 `vite.config.js`
 - 始终使用 ESM，避免 CommonJS
 
 ## 核心参考
 
 | 主题 | 描述 | 参考 |
 |------|------|------|
-| 配置 | `vite.config.ts`、`defineConfig`、条件配置、`loadEnv` | [core-config](references/core-config.md) |
+| 配置 | `vite.config.js`、`defineConfig`、条件配置、`loadEnv` | [core-config](references/core-config.md) |
 | 特性 | `import.meta.glob`、资源查询（`?raw`、`?url`）、`import.meta.env`、HMR API | [core-features](references/core-features.md) |
 | 插件 API | Vite 专属钩子、虚拟模块、插件顺序 | [core-plugin-api](references/core-plugin-api.md) |
 
@@ -52,7 +52,7 @@ vite build --ssr  # SSR 构建
 
 ### 常用配置
 
-```ts
+```js
 import { defineConfig } from 'vite'
 
 export default defineConfig({
