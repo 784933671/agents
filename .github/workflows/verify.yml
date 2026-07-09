@@ -3,15 +3,19 @@ name: Verify
 on:
   push:
     paths:
+      - ".markdownlint.json"
       - ".claude-plugin/**"
       - ".github/workflows/verify.yml"
+      - "AGENTS.md"
       - "README.md"
       - "plugins/**"
       - "scripts/**"
   pull_request:
     paths:
+      - ".markdownlint.json"
       - ".claude-plugin/**"
       - ".github/workflows/verify.yml"
+      - "AGENTS.md"
       - "README.md"
       - "plugins/**"
       - "scripts/**"
@@ -23,6 +27,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Run markdownlint
+        run: npx -y markdownlint-cli@0.43.0 '**/*.md'
+
+      - name: Run verifier tests
+        run: python3 -m unittest scripts/test_verify.py
 
       - name: Run repository verification
         run: python3 scripts/verify.py

@@ -23,7 +23,18 @@ class VerifyRepositoryChecksTest(unittest.TestCase):
         (repo / "plugins" / "demo" / "agents").mkdir()
         (repo / "plugins" / "demo" / "skills" / "demo-skill").mkdir(parents=True)
         (repo / "plugins" / "demo" / ".claude-plugin" / "plugin.json").write_text(
-            json.dumps({"name": "demo", "description": "Demo plugin."}),
+            json.dumps(
+                {
+                    "name": "demo",
+                    "displayName": "Demo",
+                    "version": "1.0.0",
+                    "description": "Demo plugin.",
+                    "author": {"name": "tester"},
+                    "repository": "https://example.com/demo",
+                    "license": "MIT",
+                    "keywords": ["demo"],
+                }
+            ),
             encoding="utf-8",
         )
         (repo / ".claude-plugin" / "marketplace.json").write_text(
@@ -75,7 +86,18 @@ class VerifyRepositoryChecksTest(unittest.TestCase):
     def test_plugin_manifest_name_must_match_marketplace_entry(self) -> None:
         repo = self.make_repo()
         (repo / "plugins" / "demo" / ".claude-plugin" / "plugin.json").write_text(
-            json.dumps({"name": "wrong-name", "description": "Demo plugin."}),
+            json.dumps(
+                {
+                    "name": "wrong-name",
+                    "displayName": "Demo",
+                    "version": "1.0.0",
+                    "description": "Demo plugin.",
+                    "author": {"name": "tester"},
+                    "repository": "https://example.com/demo",
+                    "license": "MIT",
+                    "keywords": ["demo"],
+                }
+            ),
             encoding="utf-8",
         )
 
@@ -89,7 +111,13 @@ class VerifyRepositoryChecksTest(unittest.TestCase):
             json.dumps(
                 {
                     "name": "demo",
+                    "displayName": "Demo",
+                    "version": "1.0.0",
                     "description": "Demo plugin.",
+                    "author": {"name": "tester"},
+                    "repository": "https://example.com/demo",
+                    "license": "MIT",
+                    "keywords": ["demo"],
                     "mcpServers": "./missing.mcp.json",
                 }
             ),
@@ -98,6 +126,94 @@ class VerifyRepositoryChecksTest(unittest.TestCase):
 
         with self.patch_repo(repo):
             with self.assertRaisesRegex(RuntimeError, "mcpServers file does not exist"):
+                verify.verify_json_manifests()
+
+    def test_plugin_manifest_version_must_be_semver(self) -> None:
+        repo = self.make_repo()
+        (repo / "plugins" / "demo" / ".claude-plugin" / "plugin.json").write_text(
+            json.dumps(
+                {
+                    "name": "demo",
+                    "displayName": "Demo",
+                    "description": "Demo plugin.",
+                    "version": "latest",
+                    "author": {"name": "tester"},
+                    "repository": "https://example.com/demo",
+                    "license": "MIT",
+                    "keywords": ["demo"],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with self.patch_repo(repo):
+            with self.assertRaisesRegex(RuntimeError, "version must be semver"):
+                verify.verify_json_manifests()
+
+    def test_plugin_manifest_metadata_shapes_are_validated(self) -> None:
+        repo = self.make_repo()
+        (repo / "plugins" / "demo" / ".claude-plugin" / "plugin.json").write_text(
+            json.dumps(
+                {
+                    "name": "demo",
+                    "description": "Demo plugin.",
+                    "version": "1.0.0",
+                    "displayName": "",
+                    "author": {"url": "https://example.com"},
+                    "repository": "",
+                    "license": "",
+                    "keywords": ["demo", ""],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with self.patch_repo(repo):
+            with self.assertRaisesRegex(RuntimeError, "displayName must be a non-empty string"):
+                verify.verify_json_manifests()
+
+    def test_mcp_user_config_references_must_exist_in_manifest(self) -> None:
+        repo = self.make_repo()
+        (repo / "plugins" / "demo" / ".mcp.json").write_text(
+            json.dumps(
+                {
+                    "mcpServers": {
+                        "demo": {
+                            "type": "stdio",
+                            "command": "npx",
+                            "args": ["demo@latest", "--project-id=${user_config.project_id}"],
+                            "env": {"TOKEN": "${user_config.missing_token}"},
+                        }
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+        (repo / "plugins" / "demo" / ".claude-plugin" / "plugin.json").write_text(
+            json.dumps(
+                {
+                    "name": "demo",
+                    "displayName": "Demo",
+                    "description": "Demo plugin.",
+                    "version": "1.0.0",
+                    "author": {"name": "tester"},
+                    "repository": "https://example.com/demo",
+                    "license": "MIT",
+                    "keywords": ["demo"],
+                    "mcpServers": "./.mcp.json",
+                    "userConfig": {
+                        "project_id": {
+                            "type": "string",
+                            "title": "Project ID",
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with self.patch_repo(repo):
+            with self.assertRaisesRegex(RuntimeError, "missing userConfig key"):
                 verify.verify_json_manifests()
 
     def test_agent_skill_links_must_reference_existing_local_skill(self) -> None:

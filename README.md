@@ -26,7 +26,8 @@
 - 代理适合较重的流程、审查、修复、测试和跨步骤任务。
 - 技能适合轻量知识、规范、API 模式、最佳实践和可复用执行流程。
 - 不要手改 `AGENTS-TABLE` 标记之间的表格，用脚本生成。
-- 改完市场清单、代理或技能后，必须运行 `python3 -m unittest scripts/test_verify.py` 和 `python3 scripts/verify.py`。
+- 修改可安装能力后，按语义化版本更新对应 `plugin.json` 的 `version`。
+- 改完市场清单、代理或技能后，必须运行 markdownlint、单测和仓库校验。
 
 ## 市场内容
 
@@ -135,7 +136,7 @@ skills/*/SKILL.md            # 技能入口，可包含 references/scripts/asset
 2. 按需添加 `agents/`、`skills/`、`commands/` 或 MCP 配置。
 3. 在 `.claude-plugin/marketplace.json` 的 `plugins` 数组中新增入口。
 4. 运行 `python3 scripts/sync_agents_table.py update`。
-5. 运行 `python3 scripts/verify.py`。
+5. 运行完整本地验证。
 
 新增代理：
 
@@ -155,6 +156,17 @@ skills/*/SKILL.md            # 技能入口，可包含 references/scripts/asset
 
 1. 创建 `plugins/<pack-name>/commands/<command-name>.md`。
 2. 文件内容必须包含 `$ARGUMENTS`。
+
+## 升级测试
+
+发布升级前按以下流程验证：
+
+1. 根据变更范围更新 `plugins/<pack-name>/.claude-plugin/plugin.json` 的 `version`。
+2. 运行完整本地验证。
+3. 提交并推送到插件市场仓库。
+4. 在 zCode 插件市场刷新仓库或重新安装目标能力包。
+5. 新开会话验证目标技能、代理、斜杠命令或 MCP 是否加载为新版本。
+6. 对 MCP 能力包，先填写插件配置，再运行对应自检命令，例如 `/xuegong-check`。
 
 ## 同步自动表格
 
@@ -176,16 +188,20 @@ python3 scripts/sync_agents_table.py update
 发布或提交前运行：
 
 ```bash
+npx -y markdownlint-cli@0.43.0 '**/*.md'
 python3 -m unittest scripts/test_verify.py
 python3 scripts/verify.py
 ```
 
 验证内容包括：
 
+- Markdown 文档格式是否符合本仓库规则
 - JSON 清单是否有效
 - 市场中的本地能力包来源是否存在
 - 市场入口、能力包目录与插件清单中的名称是否一致
+- `plugin.json` 版本号、展示名、作者、仓库、许可证、关键词等元数据是否完整
 - MCP 配置路径是否存在且不越出能力包目录
+- MCP 中 `${user_config.xxx}` 引用是否能匹配 `plugin.json` 的 `userConfig` 字段
 - 代理、命令、技能基本结构是否符合约定
 - 技能参考链接是否存在且不越界
 - 代理正文中引用的同包技能是否存在

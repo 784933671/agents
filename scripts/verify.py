@@ -15,6 +15,10 @@ PLUGINS_DIR = REPO_ROOT / "plugins"
 SYNC_SCRIPT = REPO_ROOT / "scripts" / "sync_agents_table.py"
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\((reference(?:s)?/[^)#]+\.md)(?:#[^)]+)?\)")
 AGENT_SKILL_LINK_RE = re.compile(r"`([a-z0-9][a-z0-9-]*)`\s*技能")
+SEMVER_RE = re.compile(
+    r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?(?:\+[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?$"
+)
+USER_CONFIG_REF_RE = re.compile(r"\$\{user_config\.([A-Za-z0-9_-]+)\}")
 SECRET_PATTERNS = (
     ("Apifox access token", re.compile(r"\bafxp_[A-Za-z0-9]{12,}\b")),
 )
@@ -58,14 +62,68 @@ def verify_no_plaintext_secrets() -> None:
     print("ok: no plaintext secrets detected")
 
 
+def require_manifest_string(manifest: dict, field: str, manifest_path: Path) -> str:
+    value = manifest.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise RuntimeError(
+            f"{manifest_path.relative_to(REPO_ROOT)} {field} must be a non-empty string"
+        )
+    return value
+
+
+def verify_plugin_metadata(manifest: dict, manifest_path: Path) -> None:
+    version = require_manifest_string(manifest, "version", manifest_path)
+    if not SEMVER_RE.fullmatch(version):
+        raise RuntimeError(
+            f"{manifest_path.relative_to(REPO_ROOT)} version must be semver (MAJOR.MINOR.PATCH)"
+        )
+
+    for field in ("displayName", "description", "repository", "license"):
+        require_manifest_string(manifest, field, manifest_path)
+
+    author = manifest.get("author")
+    if not isinstance(author, dict):
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} author must be an object")
+    author_name = author.get("name")
+    if not isinstance(author_name, str) or not author_name.strip():
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} author.name must be a non-empty string")
+    author_url = author.get("url")
+    if author_url is not None and (not isinstance(author_url, str) or not author_url.strip()):
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} author.url must be a non-empty string")
+
+    keywords = manifest.get("keywords")
+    if not isinstance(keywords, list) or not keywords:
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} keywords must be a non-empty array")
+    if any(not isinstance(keyword, str) or not keyword.strip() for keyword in keywords):
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} keywords must contain only non-empty strings")
+
+    user_config = manifest.get("userConfig")
+    if user_config is None:
+        return
+    if not isinstance(user_config, dict):
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} userConfig must be an object")
+    for key, config in user_config.items():
+        if not isinstance(key, str) or not key.strip():
+            raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} userConfig keys must be non-empty strings")
+        if not isinstance(config, dict):
+            raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} userConfig.{key} must be an object")
+        config_type = config.get("type")
+        if not isinstance(config_type, str) or not config_type.strip():
+            raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} userConfig.{key}.type must be a non-empty string")
+        description = config.get("description")
+        if description is not None and (not isinstance(description, str) or not description.strip()):
+            raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} userConfig.{key}.description must be a non-empty string")
+
+
 def verify_plugin_manifest(plugin_dir: Path, expected_name: Optional[str] = None) -> dict:
-    manifest = load_json(plugin_dir / ".claude-plugin" / "plugin.json")
+    manifest_path = plugin_dir / ".claude-plugin" / "plugin.json"
+    manifest = load_json(manifest_path)
     if not isinstance(manifest, dict):
-        raise RuntimeError(f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} must contain a JSON object")
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} must contain a JSON object")
 
     actual_name = manifest.get("name")
     if not isinstance(actual_name, str) or not actual_name:
-        raise RuntimeError(f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} missing plugin name")
+        raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} missing plugin name")
 
     if actual_name != plugin_dir.name:
         raise RuntimeError(
@@ -76,20 +134,30 @@ def verify_plugin_manifest(plugin_dir: Path, expected_name: Optional[str] = None
             f"plugin manifest name mismatch: marketplace declares `{expected_name}` but manifest declares `{actual_name}`"
         )
 
+    verify_plugin_metadata(manifest, manifest_path)
+
     mcp_servers = manifest.get("mcpServers")
     if mcp_servers is not None:
         if not isinstance(mcp_servers, str) or not mcp_servers:
-            raise RuntimeError(f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} mcpServers must be a path string")
+            raise RuntimeError(f"{manifest_path.relative_to(REPO_ROOT)} mcpServers must be a path string")
 
         mcp_path = (plugin_dir / mcp_servers).resolve()
         try:
             mcp_path.relative_to(plugin_dir)
         except ValueError as error:
             raise RuntimeError(
-                f"{(plugin_dir / '.claude-plugin/plugin.json').relative_to(REPO_ROOT)} mcpServers path escapes plugin directory"
+                f"{manifest_path.relative_to(REPO_ROOT)} mcpServers path escapes plugin directory"
             ) from error
         if not mcp_path.is_file():
             raise RuntimeError(f"mcpServers file does not exist: {mcp_path.relative_to(REPO_ROOT)}")
+
+        user_config = manifest.get("userConfig", {})
+        user_config_keys = set(user_config) if isinstance(user_config, dict) else set()
+        for key in sorted(set(USER_CONFIG_REF_RE.findall(read_text(mcp_path)))):
+            if key not in user_config_keys:
+                raise RuntimeError(
+                    f"{mcp_path.relative_to(REPO_ROOT)} references missing userConfig key: {key}"
+                )
 
     return manifest
 
