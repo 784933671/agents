@@ -59,8 +59,8 @@ description: Vue 3 内置组件（Transition、Teleport、Suspense、KeepAlive�
   <div v-if="show">Content</div>
 </Transition>
 
-<script setup lang="ts">
-function onEnter(el: Element, done: () => void) {
+<script setup>
+function onEnter(el, done) {
   // 用 JS 库做动画
   gsap.to(el, { opacity: 1, onComplete: done })
 }
@@ -161,7 +161,7 @@ Suspense 会等待：
 
 ```vue
 <!-- AsyncComponent.vue -->
-<script setup lang="ts">
+<script setup>
 const data = await fetch('/api/data').then(r => r.json())
 </script>
 ```
@@ -207,7 +207,7 @@ const data = await fetch('/api/data').then(r => r.json())
 
 ### 生命周期钩子
 
-```ts
+```js
 import { onActivated, onDeactivated } from 'vue'
 
 onActivated(() => {
@@ -251,14 +251,14 @@ onDeactivated(() => {
 
 创建可复用的 DOM 操作。
 
-```ts
+```js
 // 指令定义
-const vFocus: Directive<HTMLElement> = {
+const vFocus = {
   mounted: (el) => el.focus()
 }
 
 // 完整钩子
-const vColor: Directive<HTMLElement, string> = {
+const vColor = {
   created(el, binding, vnode, prevVnode) {},
   beforeMount(el, binding) {},
   mounted(el, binding) {
@@ -278,8 +278,8 @@ const vColor: Directive<HTMLElement, string> = {
 ```vue
 <div v-color:background.bold="'red'">
 
-<script setup lang="ts">
-const vColor: Directive<HTMLElement, string> = {
+<script setup>
+const vColor = {
   mounted(el, binding) {
     // binding.arg = 'background'
     // binding.modifiers = { bold: true }
@@ -295,8 +295,8 @@ const vColor: Directive<HTMLElement, string> = {
 
 ### 全局注册
 
-```ts
-// main.ts
+```js
+// main.js
 app.directive('focus', {
   mounted: (el) => el.focus()
 })

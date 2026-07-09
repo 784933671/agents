@@ -1,14 +1,14 @@
 ---
 name: vite-config
-description: 使用 vite.config.ts 的 Vite 配置模式
+description: 使用 vite.config.js 的 Vite 配置模式
 ---
 
 # Vite 配置
 
 ## 基础设置
 
-```ts
-// vite.config.ts
+```js
+// vite.config.js
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -16,13 +16,13 @@ export default defineConfig({
 })
 ```
 
-Vite 会自动从项目根目录解析 `vite.config.ts`。无论 `package.json` 的 `type` 是什么，都支持 ES modules 语法。
+Vite 会自动从项目根目录解析 `vite.config.js`。无论 `package.json` 的 `type` 是什么，都支持 ES modules 语法。
 
 ## 条件配置
 
 导出一个函数以访问 command 和 mode：
 
-```ts
+```js
 export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
   if (command === 'serve') {
     return { /* 开发配置 */ }
@@ -37,7 +37,7 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
 
 ## 异步配置
 
-```ts
+```js
 export default defineConfig(async ({ command, mode }) => {
   const data = await fetchSomething()
   return { /* 配置 */ }
@@ -48,7 +48,7 @@ export default defineConfig(async ({ command, mode }) => {
 
 `.env` 文件在配置解析**之后**加载。使用 `loadEnv` 在配置中访问它们：
 
-```ts
+```js
 import { defineConfig, loadEnv } from 'vite'
 
 export default defineConfig(({ mode }) => {
@@ -70,7 +70,7 @@ export default defineConfig(({ mode }) => {
 
 ### resolve.alias
 
-```ts
+```js
 export default defineConfig({
   resolve: {
     alias: {
@@ -83,7 +83,7 @@ export default defineConfig({
 
 ### define（全局常量）
 
-```ts
+```js
 export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify('1.0.0'),
@@ -96,7 +96,7 @@ export default defineConfig({
 
 ### plugins
 
-```ts
+```js
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
@@ -108,7 +108,7 @@ plugins 数组会被扁平化；假值会被忽略。
 
 ### server.proxy
 
-```ts
+```js
 export default defineConfig({
   server: {
     proxy: {
@@ -126,7 +126,7 @@ export default defineConfig({
 
 默认：Baseline Widely Available 浏览器。自定义：
 
-```ts
+```js
 export default defineConfig({
   build: {
     target: 'esnext', // 或 'es2020'、['chrome90', 'firefox88']
@@ -134,7 +134,7 @@ export default defineConfig({
 })
 ```
 
-## TypeScript 智能提示
+## JavaScript 智能提示
 
 对于纯 JS 配置文件：
 
@@ -143,16 +143,6 @@ export default defineConfig({
 export default {
   // ...
 }
-```
-
-或使用 `satisfies`：
-
-```ts
-import type { UserConfig } from 'vite'
-
-export default {
-  // ...
-} satisfies UserConfig
 ```
 
 <!--

@@ -3,7 +3,7 @@ title: 指令最佳实践
 impact: MEDIUM
 impactDescription: 自定义指令功能强大但容易误用；遵循这些模式可避免内存泄漏、无效用法和不清晰的抽象
 type: best-practice
-tags: [vue3, directives, custom-directives, composition, typescript]
+tags: [vue3, directives, custom-directives, composition, javascript]
 ---
 
 # 指令最佳实践
@@ -16,14 +16,14 @@ tags: [vue3, directives, custom-directives, composition, typescript]
 - 不要修改指令的参数或 binding 对象
 - 在 `unmounted` 中清理定时器、监听器和 observer
 - 在 `<script setup>` 中以 `v-` 前缀注册指令
-- 在 TypeScript 项目中，为指令值标注类型，并扩展模板指令类型
+- 在 JavaScript 项目中，为指令值标注类型，并扩展模板指令类型
 - 对于复杂行为，优先使用组件或 composable
 
 ## 把指令参数当作只读对待
 
 指令的 binding 并不是响应式存储。不要向其写入。
 
-```ts
+```js
 const vFocus = {
   mounted(el, binding) {
     // binding.value 是只读的
@@ -57,7 +57,7 @@ const vFocus = (el) => el.focus()
 
 任何定时器、监听器或 observer 都必须被移除，以避免内存泄漏。
 
-```ts
+```js
 const vResize = {
   mounted(el) {
     const observer = new ResizeObserver(() => {})
@@ -74,7 +74,7 @@ const vResize = {
 
 如果只需要 `mounted`/`updated`，使用函数形式即可。
 
-```ts
+```js
 const vAutofocus = (el) => el.focus()
 ```
 
@@ -90,13 +90,12 @@ const vFocus = (el) => el.focus()
 </template>
 ```
 
-## 在 TypeScript 项目中为自定义指令标注类型
+## 让自定义指令契约清晰
 
-使用 `Directive<Element, ValueType>` 让 `binding.value` 拥有类型，并扩展 Vue 的模板类型，使指令在 SFC 模板中能被识别。
+用运行时校验和清晰命名约束 `binding.value`，避免指令接收错误值时静默失败。
 
 **BAD：**
-```ts
-// 指令值未标注类型，且没有模板类型扩展
+```js
 export const vHighlight = {
   mounted(el, binding) {
     el.style.backgroundColor = binding.value
@@ -105,20 +104,11 @@ export const vHighlight = {
 ```
 
 **GOOD：**
-```ts
-import type { Directive } from 'vue'
-
-type HighlightValue = string
-
+```js
 export const vHighlight = {
   mounted(el, binding) {
+    if (typeof binding.value !== 'string') return
     el.style.backgroundColor = binding.value
-  }
-} satisfies Directive<HTMLElement, HighlightValue>
-
-declare module 'vue' {
-  interface ComponentCustomProperties {
-    vHighlight: typeof vHighlight
   }
 }
 ```
@@ -128,7 +118,7 @@ declare module 'vue' {
 `mounted` 和 `updated` 等指令钩子在 SSR 期间不会执行。如果某个指令会设置影响渲染 HTML 的属性/类，请通过 `getSSRProps` 提供 SSR 等价实现，以避免 hydration 不一致。
 
 **BAD：**
-```ts
+```js
 const vTooltip = {
   mounted(el, binding) {
     el.setAttribute('data-tooltip', binding.value)
@@ -138,7 +128,7 @@ const vTooltip = {
 ```
 
 **GOOD：**
-```ts
+```js
 const vTooltip = {
   mounted(el, binding) {
     el.setAttribute('data-tooltip', binding.value)

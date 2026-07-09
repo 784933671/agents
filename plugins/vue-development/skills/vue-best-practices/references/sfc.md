@@ -12,7 +12,7 @@ tags: [vue3, sfc, scoped-css, styles, build-tools, performance, template, v-html
 
 ## 任务清单
 
-- 使用 `.vue` SFC，而不是为组件单独拆分 `.js`/`.ts` 与 `.css` 文件
+- 使用 `.vue` SFC，而不是为组件单独拆分 `.js`/`.js` 与 `.css` 文件
 - 默认将 template、script 和 styles 共置于同一个 SFC 中
 - 在模板和文件名中为组件名使用 PascalCase
 - 优先使用组件作用域样式
@@ -161,7 +161,7 @@ p { line-height: 1.6; }
 对于 Vue 3.5+：使用 `useTemplateRef()` 访问模板 ref。
 
 ```vue
-<script setup lang="ts">
+<script setup>
 import { onMounted, useTemplateRef } from 'vue'
 
 const inputRef = useTemplateRef<HTMLInputElement>('input')
@@ -228,7 +228,7 @@ onMounted(() => {
 **正面示例：**
 
 ```vue
-<script setup lang="ts">
+<script setup>
 import { computed } from 'vue'
 
 const activeUsers = computed(() => users.value.filter(u => u.active))
@@ -268,10 +268,16 @@ const activeUsers = computed(() => users.value.filter(u => u.active))
 import { computed } from 'vue'
 import DOMPurify from 'dompurify'
 
-const props = defineProps<{
-  trustedHtml?: string
-  plainText: string
-}>()
+const props = defineProps({
+  trustedHtml: {
+    type: String,
+    default: '',
+  },
+  plainText: {
+    type: String,
+    required: true,
+  },
+})
 
 const safeHtml = computed(() => DOMPurify.sanitize(props.trustedHtml ?? ''))
 </script>

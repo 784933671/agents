@@ -9,7 +9,7 @@ description: 使用 @pinia/testing 对 store 和组件进行单元测试
 
 为每个测试创建全新的 pinia 实例：
 
-```ts
+```js
 import { setActivePinia, createPinia } from 'pinia'
 import { useCounterStore } from '../src/stores/counter'
 
@@ -29,7 +29,7 @@ describe('Counter Store', () => {
 
 ### 带插件
 
-```ts
+```js
 import { setActivePinia, createPinia } from 'pinia'
 import { createApp } from 'vue'
 import { somePlugin } from '../src/stores/plugin'
@@ -53,7 +53,7 @@ npm i -D @pinia/testing
 
 使用 `createTestingPinia()`：
 
-```ts
+```js
 import { mount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 import { useSomeStore } from '@/stores/myStore'
@@ -79,7 +79,7 @@ expect(store.someAction).toHaveBeenCalledTimes(1)
 
 为测试设置初始 state：
 
-```ts
+```js
 const wrapper = mount(Counter, {
   global: {
     plugins: [
@@ -97,13 +97,13 @@ const wrapper = mount(Counter, {
 
 ### 执行真实 Action
 
-```ts
+```js
 createTestingPinia({ stubActions: false })
 ```
 
 ### 选择性 Stub
 
-```ts
+```js
 // 只 stub 特定 action
 createTestingPinia({
   stubActions: ['increment', 'reset'],
@@ -120,8 +120,8 @@ createTestingPinia({
 
 ### Mock Action 返回值
 
-```ts
-import type { Mock } from 'vitest'
+```js
+import { Mock } from 'vitest'
 
 // 获取 store 之后
 store.someAction.mockResolvedValue('mocked value')
@@ -131,7 +131,7 @@ store.someAction.mockResolvedValue('mocked value')
 
 测试中 getter 是可写的：
 
-```ts
+```js
 const pinia = createTestingPinia()
 const counter = useCounterStore(pinia)
 
@@ -146,7 +146,7 @@ counter.double // 现在正常计算
 
 如果使用的不是带 globals 的 Jest/Vitest：
 
-```ts
+```js
 import { vi } from 'vitest'
 
 createTestingPinia({
@@ -156,7 +156,7 @@ createTestingPinia({
 
 配合 Sinon：
 
-```ts
+```js
 import sinon from 'sinon'
 
 createTestingPinia({
@@ -168,7 +168,7 @@ createTestingPinia({
 
 把插件传给 `createTestingPinia()`：
 
-```ts
+```js
 import { somePlugin } from '../src/stores/plugin'
 
 createTestingPinia({
@@ -178,29 +178,6 @@ createTestingPinia({
 ```
 
 **不要使用** `testingPinia.use(MyPlugin)` —— 应在选项中传入插件。
-
-## 类型安全的 Mock Store
-
-```ts
-import type { Mock } from 'vitest'
-import type { Store, StoreDefinition } from 'pinia'
-
-function mockedStore<TStoreDef extends () => unknown>(
-  useStore: TStoreDef
-): TStoreDef extends StoreDefinition<infer Id, infer State, infer Getters, infer Actions>
-  ? Store<Id, State, Record<string, never>, {
-      [K in keyof Actions]: Actions[K] extends (...args: any[]) => any
-        ? Mock<Actions[K]>
-        : Actions[K]
-    }>
-  : ReturnType<TStoreDef> {
-  return useStore() as any
-}
-
-// 用法
-const store = mockedStore(useSomeStore)
-store.someAction.mockResolvedValue('value') // 有类型！
-```
 
 ## E2E 测试
 

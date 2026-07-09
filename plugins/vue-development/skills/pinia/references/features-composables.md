@@ -11,7 +11,7 @@ Pinia store 可以利用 Vue composables 来复用有状态逻辑。
 
 在 `state` 属性内部调用 composable，但仅限返回可写 ref 的那些：
 
-```ts
+```js
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 
@@ -34,18 +34,18 @@ export const useAuthStore = defineStore('auth', {
 
 更灵活 —— 几乎可以使用任何 composable：
 
-```ts
+```js
 import { defineStore } from 'pinia'
 import { useMediaControls } from '@vueuse/core'
 import { ref } from 'vue'
 
 export const useVideoPlayer = defineStore('video', () => {
-  const videoElement = ref<HTMLVideoElement>()
+  const videoElement = ref()
   const src = ref('/data/video.mp4')
   const { playing, volume, currentTime, togglePictureInPicture } =
     useMediaControls(videoElement, { src })
 
-  function loadVideo(element: HTMLVideoElement, newSrc: string) {
+  function loadVideo(element, newSrc) {
     videoElement.value = element
     src.value = newSrc
   }
@@ -69,7 +69,7 @@ export const useVideoPlayer = defineStore('video', () => {
 
 定义一个 `hydrate()` 函数处理客户端水合：
 
-```ts
+```js
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 
@@ -89,7 +89,7 @@ export const useAuthStore = defineStore('auth', {
 
 标记不应从服务端水合的 state：
 
-```ts
+```js
 import { defineStore, skipHydrate } from 'pinia'
 import { useEyeDropper, useLocalStorage } from '@vueuse/core'
 

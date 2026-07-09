@@ -27,28 +27,28 @@ tags: [vue3, state-management, pinia, composables, ssr, vueuse]
 ## 避免导出可变的模块状态
 
 **反面示例：**
-```ts
-// store/cart.ts
+```js
+// store/cart.js
 import { reactive } from 'vue'
 
 export const cart = reactive({
-  items: [] as Array<{ id: string; qty: number }>
+  items: []
 })
 ```
 
 **正面示例：**
-```ts
-// composables/useCartStore.ts
+```js
+// composables/useCartStore.js
 import { reactive, readonly } from 'vue'
 
-let _store: ReturnType<typeof createCartStore> | null = null
+let _store = null
 
 function createCartStore() {
   const state = reactive({
-    items: [] as Array<{ id: string; qty: number }>
+    items: []
   })
 
-  function addItem(id: string, qty = 1) {
+  function addItem(id, qty = 1) {
     const existing = state.items.find((item) => item.id === id)
     if (existing) {
       existing.qty += qty
@@ -74,7 +74,7 @@ export function useCartStore() {
 模块单例在整个运行时生命周期内存在。在 SSR 中这会导致请求间的状态泄漏。
 
 **反面示例：**
-```ts
+```js
 // 跨请求复用的共享单例
 const cartStore = useCartStore()
 
@@ -87,16 +87,16 @@ export function useServerCart() {
 
 > 需要 `pinia` 依赖。
 
-```ts
-// stores/cart.ts
+```js
+// stores/cart.js
 import { defineStore } from 'pinia'
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: [] as Array<{ id: string; qty: number }>
+    items: []
   }),
   actions: {
-    addItem(id: string, qty = 1) {
+    addItem(id, qty = 1) {
       const existing = this.items.find((item) => item.id === id)
       if (existing) {
         existing.qty += qty
@@ -114,15 +114,15 @@ export const useCartStore = defineStore('cart', {
 
 如果应用是非 SSR 且已经使用了 VueUse，`createGlobalState` 可以省去单例样板代码。
 
-```ts
+```js
 import { createGlobalState } from '@vueuse/core'
 import { computed, ref } from 'vue'
 
 export const useAuthState = createGlobalState(() => {
-  const token = ref<string | null>(null)
+  const token = ref(null)
   const isAuthenticated = computed(() => token.value !== null)
 
-  function setToken(next: string | null) {
+  function setToken(next) {
     token.value = next
   }
 

@@ -20,7 +20,10 @@ SEMVER_RE = re.compile(
 )
 USER_CONFIG_REF_RE = re.compile(r"\$\{user_config\.([A-Za-z0-9_-]+)\}")
 VUE_JS_ONLY_ENTRYPOINT_RE = re.compile(
-    r"TypeScript|typescript|lang=[\"']ts[\"']|vue-tsc|vite\.config\.ts|defineProps<|defineEmits<|InjectionKey|import type"
+    r"TypeScript|typescript|lang=[\"']ts[\"']|vue-tsc|vite\.config\.ts|\.ts\b|\.tsx\b|"
+    r"defineProps<|defineEmits<|InjectionKey|import type|interface\s+|ref<|satisfies|"
+    r"Directive<|Plugin<|StoreDefinition|Mock<|ReturnType<|MaybeRefOrGetter|"
+    r"PiniaPluginContext|HTMLVideoElement|MouseEvent|HTMLElement"
 )
 SECRET_PATTERNS = (
     ("Apifox access token", re.compile(r"\bafxp_[A-Za-z0-9]{12,}\b")),
@@ -258,13 +261,13 @@ def verify_plugin_content() -> None:
     print("ok: plugin content structure is valid")
 
 
-def verify_vue_development_entrypoints_are_js_only() -> None:
+def verify_vue_development_docs_are_js_only() -> None:
     vue_plugin_dir = PLUGINS_DIR / "vue-development"
     if not vue_plugin_dir.is_dir():
         return
 
     entrypoints = [
-        *sorted(vue_plugin_dir.glob("skills/*/SKILL.md")),
+        *sorted((vue_plugin_dir / "skills").rglob("*.md")),
         *sorted((vue_plugin_dir / "agents").glob("*.md")),
         *sorted((vue_plugin_dir / "commands").glob("*.md")),
     ]
@@ -272,10 +275,10 @@ def verify_vue_development_entrypoints_are_js_only() -> None:
         match = VUE_JS_ONLY_ENTRYPOINT_RE.search(read_text(entrypoint))
         if match:
             raise RuntimeError(
-                f"{entrypoint.relative_to(REPO_ROOT)} contains TypeScript-oriented entrypoint text: {match.group(0)}"
+                f"{entrypoint.relative_to(REPO_ROOT)} contains TypeScript-oriented Vue documentation: {match.group(0)}"
             )
 
-    print("ok: vue-development entrypoints are JavaScript-oriented")
+    print("ok: vue-development documentation is JavaScript-oriented")
 
 
 def verify_skill_references() -> None:
@@ -416,7 +419,7 @@ def main() -> int:
         verify_no_plaintext_secrets()
         verify_json_manifests()
         verify_plugin_content()
-        verify_vue_development_entrypoints_are_js_only()
+        verify_vue_development_docs_are_js_only()
         verify_skill_references()
         verify_agent_skill_links()
         verify_agent_routing_guide()

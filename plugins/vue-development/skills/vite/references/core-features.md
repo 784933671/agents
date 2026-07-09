@@ -9,9 +9,9 @@ description: Vite 专属的导入模式与运行时特性
 
 导入匹配某个模式的多个模块：
 
-```ts
-const modules = import.meta.glob('./dir/*.ts')
-// { './dir/foo.ts': () => import('./dir/foo.ts'), ... }
+```js
+const modules = import.meta.glob('./dir/*.js')
+// { './dir/foo.js': () => import('./dir/foo.js'), ... }
 
 for (const path in modules) {
   modules[path]().then((mod) => {
@@ -22,35 +22,35 @@ for (const path in modules) {
 
 ### 同步加载
 
-```ts
-const modules = import.meta.glob('./dir/*.ts', { eager: true })
+```js
+const modules = import.meta.glob('./dir/*.js', { eager: true })
 // 模块立即加载，无动态 import
 ```
 
 ### 具名导入
 
-```ts
-const modules = import.meta.glob('./dir/*.ts', { import: 'setup' })
+```js
+const modules = import.meta.glob('./dir/*.js', { import: 'setup' })
 // 只导入每个模块的 'setup' 导出
 
-const defaults = import.meta.glob('./dir/*.ts', { import: 'default', eager: true })
+const defaults = import.meta.glob('./dir/*.js', { import: 'default', eager: true })
 ```
 
 ### 多模式
 
-```ts
-const modules = import.meta.glob(['./dir/*.ts', './another/*.ts'])
+```js
+const modules = import.meta.glob(['./dir/*.js', './another/*.js'])
 ```
 
 ### 负向模式
 
-```ts
-const modules = import.meta.glob(['./dir/*.ts', '!**/ignored.ts'])
+```js
+const modules = import.meta.glob(['./dir/*.js', '!**/ignored.js'])
 ```
 
 ### 自定义查询
 
-```ts
+```js
 const svgRaw = import.meta.glob('./icons/*.svg', { query: '?raw', import: 'default' })
 const svgUrls = import.meta.glob('./icons/*.svg', { query: '?url', import: 'default' })
 ```
@@ -59,44 +59,44 @@ const svgUrls = import.meta.glob('./icons/*.svg', { query: '?url', import: 'defa
 
 ### URL 导入
 
-```ts
+```js
 import imgUrl from './img.png'
 // 返回解析后的 URL：'/src/img.png'（开发）或 '/assets/img.2d8efhg.png'（构建）
 ```
 
 ### 显式 URL
 
-```ts
+```js
 import workletUrl from './worklet.js?url'
 ```
 
 ### 原始字符串
 
-```ts
+```js
 import shaderCode from './shader.glsl?raw'
 ```
 
 ### 内联/不内联
 
-```ts
+```js
 import inlined from './small.png?inline'    // 强制 base64 内联
 import notInlined from './large.png?no-inline'  // 强制单独文件
 ```
 
 ### Web Worker
 
-```ts
-import Worker from './worker.ts?worker'
+```js
+import Worker from './worker.js?worker'
 const worker = new Worker()
 
 // 或内联：
-import InlineWorker from './worker.ts?worker&inline'
+import InlineWorker from './worker.js?worker&inline'
 ```
 
 使用构造器的推荐模式：
 
-```ts
-const worker = new Worker(new URL('./worker.ts', import.meta.url), {
+```js
+const worker = new Worker(new URL('./worker.js', import.meta.url), {
   type: 'module',
 })
 ```
@@ -105,7 +105,7 @@ const worker = new Worker(new URL('./worker.ts', import.meta.url), {
 
 ### 内置常量
 
-```ts
+```js
 import.meta.env.MODE      // 'development' | 'production' | 自定义
 import.meta.env.BASE_URL  // 来自配置的 Base URL
 import.meta.env.PROD      // 生产环境为 true
@@ -123,7 +123,7 @@ VITE_API_URL=https://api.example.com
 DB_PASSWORD=secret  # 不暴露给客户端
 ```
 
-```ts
+```js
 console.log(import.meta.env.VITE_API_URL) // 可用
 console.log(import.meta.env.DB_PASSWORD)  // undefined
 ```
@@ -137,19 +137,6 @@ console.log(import.meta.env.DB_PASSWORD)  // undefined
 .env.[mode].local   # 仅在指定 mode 下加载，gitignore
 ```
 
-### TypeScript 支持
-
-```ts
-// vite-env.d.ts
-interface ImportMetaEnv {
-  readonly VITE_API_URL: string
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
-```
-
 ### HTML 替换
 
 ```html
@@ -161,28 +148,28 @@ interface ImportMeta {
 
 任何 `.module.css` 文件都会被当作 CSS module：
 
-```ts
+```js
 import styles from './component.module.css'
 element.className = styles.button
 ```
 
 带 camelCase 转换：
 
-```ts
+```js
 // .my-class -> myClass（若配置了 css.modules.localsConvention）
 import { myClass } from './component.module.css'
 ```
 
 ## JSON 导入
 
-```ts
+```js
 import pkg from './package.json'
 import { version } from './package.json'  // 具名导入，支持 tree-shaking
 ```
 
 ## HMR API
 
-```ts
+```js
 if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
     // 处理更新

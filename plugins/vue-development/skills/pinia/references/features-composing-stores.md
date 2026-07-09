@@ -11,7 +11,7 @@ Store 之间可以互相使用，共享 state 与逻辑。
 
 两个 store 不能在 setup 阶段直接读取彼此的 state：
 
-```ts
+```js
 // ❌ 无限循环
 const useX = defineStore('x', () => {
   const y = useY()
@@ -28,7 +28,7 @@ const useY = defineStore('y', () => {
 
 **解决方案：** 在 getter、computed 或 action 中读取：
 
-```ts
+```js
 const useX = defineStore('x', () => {
   const y = useY()
 
@@ -43,7 +43,7 @@ const useX = defineStore('x', () => {
 
 ## Setup Store：在顶层使用其它 Store
 
-```ts
+```js
 import { defineStore } from 'pinia'
 import { useUserStore } from './user'
 
@@ -67,7 +67,7 @@ export const useCartStore = defineStore('cart', () => {
 
 在 getter 内部调用 `useStore()`：
 
-```ts
+```js
 import { useUserStore } from './user'
 
 export const useCartStore = defineStore('cart', {
@@ -84,7 +84,7 @@ export const useCartStore = defineStore('cart', {
 
 在 action 内部调用 `useStore()`：
 
-```ts
+```js
 import { useUserStore } from './user'
 import { apiOrderCart } from './api'
 
@@ -108,7 +108,7 @@ export const useCartStore = defineStore('cart', {
 
 在异步 action 中，所有 store 调用都要在任何 `await` 之前：
 
-```ts
+```js
 actions: {
   async orderCart() {
     // ✅ 所有 useStore() 调用在 await 之前

@@ -9,15 +9,15 @@ description: Vite 库模式、多页应用、JavaScript API 与 SSR 指引
 
 构建可分发的库：
 
-```ts
-// vite.config.ts
+```js
+// vite.config.js
 import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(import.meta.dirname, 'lib/main.ts'),
+      entry: resolve(import.meta.dirname, 'lib/main.js'),
       name: 'MyLib',
       fileName: 'my-lib',
     },
@@ -36,12 +36,12 @@ export default defineConfig({
 
 ### 多入口
 
-```ts
+```js
 build: {
   lib: {
     entry: {
-      'my-lib': resolve(import.meta.dirname, 'lib/main.ts'),
-      secondary: resolve(import.meta.dirname, 'lib/secondary.ts'),
+      'my-lib': resolve(import.meta.dirname, 'lib/main.js'),
+      secondary: resolve(import.meta.dirname, 'lib/secondary.js'),
     },
     name: 'MyLib',
   },
@@ -74,7 +74,7 @@ build: {
 
 ## 多页应用
 
-```ts
+```js
 export default defineConfig({
   build: {
     rolldownOptions: {
@@ -104,7 +104,7 @@ export default defineConfig({
 
 ### createServer
 
-```ts
+```js
 import { createServer } from 'vite'
 
 const server = await createServer({
@@ -119,7 +119,7 @@ server.printUrls()
 
 ### build
 
-```ts
+```js
 import { build } from 'vite'
 
 await build({
@@ -130,7 +130,7 @@ await build({
 
 ### preview
 
-```ts
+```js
 import { preview } from 'vite'
 
 const previewServer = await preview({
@@ -141,7 +141,7 @@ previewServer.printUrls()
 
 ### resolveConfig
 
-```ts
+```js
 import { resolveConfig } from 'vite'
 
 const config = await resolveConfig({}, 'build')
@@ -149,7 +149,7 @@ const config = await resolveConfig({}, 'build')
 
 ### loadEnv
 
-```ts
+```js
 import { loadEnv } from 'vite'
 
 const env = loadEnv('development', process.cwd(), '')

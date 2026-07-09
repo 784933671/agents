@@ -228,7 +228,7 @@ class VerifyRepositoryChecksTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "unknown skill reference"):
                 verify.verify_agent_skill_links()
 
-    def test_vue_development_entrypoints_must_stay_javascript_oriented(self) -> None:
+    def test_vue_development_docs_must_stay_javascript_oriented(self) -> None:
         repo = self.make_repo()
         skill_dir = repo / "plugins" / "vue-development" / "skills" / "bad-skill"
         skill_dir.mkdir(parents=True)
@@ -239,8 +239,8 @@ class VerifyRepositoryChecksTest(unittest.TestCase):
         )
 
         with self.patch_repo(repo):
-            with self.assertRaisesRegex(RuntimeError, "TypeScript-oriented entrypoint"):
-                verify.verify_vue_development_entrypoints_are_js_only()
+            with self.assertRaisesRegex(RuntimeError, "TypeScript-oriented Vue documentation"):
+                verify.verify_vue_development_docs_are_js_only()
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ description: Vue 3 响应式系统、生命周期钩子与 composable 模式
 
 ### ref 与 shallowRef
 
-```ts
+```js
 import { ref, shallowRef } from 'vue'
 
 // ref —— 深层响应式（追踪嵌套变化）
@@ -26,7 +26,7 @@ data.value = { items: ['new'] }  // 触发响应式
 
 ### computed
 
-```ts
+```js
 import { ref, computed } from 'vue'
 
 const count = ref(0)
@@ -43,7 +43,7 @@ const plusOne = computed({
 
 ### reactive 与 readonly
 
-```ts
+```js
 import { reactive, readonly } from 'vue'
 
 const state = reactive({ count: 0, nested: { value: 1 } })
@@ -59,7 +59,7 @@ readonlyState.count++  // 警告，修改被阻止
 
 ### watch
 
-```ts
+```js
 import { ref, watch } from 'vue'
 
 const count = ref(0)
@@ -92,7 +92,7 @@ watch(source, callback, { once: true })
 
 立即执行并自动追踪依赖。
 
-```ts
+```js
 import { ref, watchEffect, onWatcherCleanup } from 'vue'
 
 const id = ref(1)
@@ -116,7 +116,7 @@ stop()
 
 ### 刷新时机
 
-```ts
+```js
 // 'pre'（默认）—— 组件更新前
 // 'post' —— 组件更新后（可访问更新后的 DOM）
 // 'sync' —— 立即执行，谨慎使用
@@ -127,7 +127,7 @@ watchPostEffect(() => {})  // flush: 'post' 的别名
 
 ## 生命周期钩子
 
-```ts
+```js
 import {
   onBeforeMount,
   onMounted,
@@ -160,7 +160,7 @@ onErrorCaptured((err, instance, info) => {
 
 将响应式副作用分组以便批量销毁。
 
-```ts
+```js
 import { effectScope, onScopeDispose } from 'vue'
 
 const scope = effectScope()
@@ -191,15 +191,15 @@ Composable 是用 Composition API 封装有状态逻辑的函数。
 
 ### 模式
 
-```ts
-// composables/useMouse.ts
+```js
+// composables/useMouse.js
 import { ref, onMounted, onUnmounted } from 'vue'
 
 export function useMouse() {
   const x = ref(0)
   const y = ref(0)
 
-  const update = (e: MouseEvent) => {
+  const update = (e) => {
     x.value = e.pageX
     y.value = e.pageY
   }
@@ -215,10 +215,10 @@ export function useMouse() {
 
 使用 `toValue()`（Vue 3.3+）规范化 ref、getter 或普通值。
 
-```ts
-import { ref, watchEffect, toValue, type MaybeRefOrGetter } from 'vue'
+```js
+import { ref, watchEffect, toValue } from 'vue'
 
-export function useFetch(url: MaybeRefOrGetter<string>) {
+export function useFetch(url) {
   const data = ref(null)
   const error = ref(null)
 
@@ -247,7 +247,7 @@ useFetch(() => `/api/users/${props.id}`)
 
 始终返回包含 ref 的普通对象，以保证解构兼容性。
 
-```ts
+```js
 // 正确 —— 解构时保留响应式
 return { x, y }
 

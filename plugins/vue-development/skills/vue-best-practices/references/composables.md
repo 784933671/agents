@@ -125,15 +125,8 @@ useFetch('/api/users', {
 })
 ```
 
-```typescript
-interface UseCounterOptions {
-  initial?: number
-  min?: number
-  max?: number
-  step?: number
-}
-
-export function useCounter(options: UseCounterOptions = {}) {
+```js
+export function useCounter(options = {}) {
   const { initial = 0, min = -Infinity, max = Infinity, step = 1 } = options
   // implementation
 }

@@ -22,7 +22,7 @@ const main = useMainStore()
 
 显式传入 `pinia` 实例：
 
-```ts
+```js
 const pinia = createPinia()
 const app = createApp(App)
 app.use(router)
@@ -42,7 +42,7 @@ router.beforeEach((to) => {
 
 通过 `this.$pinia` 访问 pinia：
 
-```ts
+```js
 export default {
   serverPrefetch() {
     const store = useStore(this.$pinia)
@@ -73,7 +73,7 @@ onServerPrefetch(async () => {
 
 使用 [devalue](https://github.com/Rich-Harris/devalue) 进行 XSS 安全的序列化：
 
-```ts
+```js
 import devalue from 'devalue'
 import { createPinia } from 'pinia'
 
@@ -91,7 +91,7 @@ const serializedState = devalue(pinia.state.value)
 
 在任何 `useStore()` 调用之前水合：
 
-```ts
+```js
 const pinia = createPinia()
 const app = createApp(App)
 app.use(pinia)
@@ -104,7 +104,7 @@ if (typeof window !== 'undefined') {
 
 ## SSR 示例
 
-- [Vitesse 模板](https://github.com/antfu/vitesse/blob/main/src/modules/pinia.ts)
+- [Vitesse 模板](https://github.com/antfu/vitesse/blob/main/src/modules/pinia.js)
 - [vite-plugin-ssr](https://vite-plugin-ssr.com/pinia)
 
 ## 关键要点

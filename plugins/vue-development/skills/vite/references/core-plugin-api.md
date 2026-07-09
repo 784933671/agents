@@ -9,8 +9,8 @@ Vite 插件扩展了 Rolldown 的插件接口，增加了 Vite 专属钩子。
 
 ## 基础结构
 
-```ts
-function myPlugin(): Plugin {
+```js
+function myPlugin() {
   return {
     name: 'my-plugin',
     // 钩子...
@@ -24,7 +24,7 @@ function myPlugin(): Plugin {
 
 在解析前修改配置：
 
-```ts
+```js
 const plugin = () => ({
   name: 'add-alias',
   config: () => ({
@@ -39,7 +39,7 @@ const plugin = () => ({
 
 访问最终解析的配置：
 
-```ts
+```js
 const plugin = () => {
   let config: ResolvedConfig
   return {
@@ -58,7 +58,7 @@ const plugin = () => {
 
 为开发服务器添加自定义中间件：
 
-```ts
+```js
 const plugin = () => ({
   name: 'custom-middleware',
   configureServer(server) {
@@ -72,7 +72,7 @@ const plugin = () => ({
 
 返回函数会在内部中间件**之后**运行：
 
-```ts
+```js
 configureServer(server) {
   return () => {
     server.middlewares.use((req, res, next) => {
@@ -86,7 +86,7 @@ configureServer(server) {
 
 转换 HTML 入口文件：
 
-```ts
+```js
 const plugin = () => ({
   name: 'html-transform',
   transformIndexHtml(html) {
@@ -97,7 +97,7 @@ const plugin = () => ({
 
 注入标签：
 
-```ts
+```js
 transformIndexHtml() {
   return [
     { tag: 'script', attrs: { src: '/inject.js' }, injectTo: 'body' },
@@ -109,7 +109,7 @@ transformIndexHtml() {
 
 自定义 HMR 处理：
 
-```ts
+```js
 handleHotUpdate({ server, modules, timestamp }) {
   server.ws.send({ type: 'custom', event: 'special-update', data: {} })
   return [] // 空数组 = 跳过默认 HMR
@@ -120,7 +120,7 @@ handleHotUpdate({ server, modules, timestamp }) {
 
 无需磁盘文件即可提供虚拟内容：
 
-```ts
+```js
 const plugin = () => {
   const virtualModuleId = 'virtual:my-module'
   const resolvedId = '\0' + virtualModuleId
@@ -141,7 +141,7 @@ const plugin = () => {
 
 用法：
 
-```ts
+```js
 import { msg } from 'virtual:my-module'
 ```
 
@@ -151,7 +151,7 @@ import { msg } from 'virtual:my-module'
 
 用 `enforce` 控制执行顺序：
 
-```ts
+```js
 {
   name: 'pre-plugin',
   enforce: 'pre',  // 在核心插件之前运行
@@ -167,7 +167,7 @@ import { msg } from 'virtual:my-module'
 
 ## 条件应用
 
-```ts
+```js
 {
   name: 'build-only',
   apply: 'build',  // 或 'serve'
@@ -189,7 +189,7 @@ import { msg } from 'virtual:my-module'
 - `load(id)` - 加载模块内容
 - `transform(code, id)` - 转换模块代码
 
-```ts
+```js
 transform(code, id) {
   if (id.endsWith('.custom')) {
     return { code: compile(code), map: null }
@@ -201,7 +201,7 @@ transform(code, id) {
 
 服务端到客户端：
 
-```ts
+```js
 configureServer(server) {
   server.ws.send('my:event', { msg: 'hello' })
 }
@@ -209,7 +209,7 @@ configureServer(server) {
 
 客户端：
 
-```ts
+```js
 if (import.meta.hot) {
   import.meta.hot.on('my:event', (data) => {
     console.log(data.msg)
@@ -219,7 +219,7 @@ if (import.meta.hot) {
 
 客户端到服务端：
 
-```ts
+```js
 // 客户端
 import.meta.hot.send('my:from-client', { msg: 'Hey!' })
 

@@ -22,8 +22,8 @@ npx nuxi@latest module add pinia
 
 ## 配置
 
-```ts
-// nuxt.config.ts
+```js
+// nuxt.config.js
 export default defineNuxtConfig({
   modules: ['@pinia/nuxt'],
 })
@@ -41,8 +41,8 @@ export default defineNuxtConfig({
 
 ### 自定义 store 目录
 
-```ts
-// nuxt.config.ts
+```js
+// nuxt.config.js
 export default defineNuxtConfig({
   modules: ['@pinia/nuxt'],
   pinia: {
@@ -79,8 +79,8 @@ await callOnce('user', () => store.fetchUser(), { mode: 'navigation' })
 
 在导航守卫、中间件或其他 store 中，传入 `pinia` 实例：
 
-```ts
-// middleware/auth.ts
+```js
+// middleware/auth.js
 export default defineNuxtRouteMiddleware((to) => {
   const nuxtApp = useNuxtApp()
   const store = useStore(nuxtApp.$pinia)
@@ -97,11 +97,9 @@ export default defineNuxtRouteMiddleware((to) => {
 
 创建一个 Nuxt 插件：
 
-```ts
-// plugins/myPiniaPlugin.ts
-import { PiniaPluginContext } from 'pinia'
-
-function MyPiniaPlugin({ store }: PiniaPluginContext) {
+```js
+// plugins/myPiniaPlugin.js
+function MyPiniaPlugin({ store }) {
   store.$subscribe((mutation) => {
     console.log(`[🍍 ${mutation.storeId}]: ${mutation.type}`)
   })

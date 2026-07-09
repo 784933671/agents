@@ -23,7 +23,7 @@ tags: [vue3, async-components, ssr, hydration, performance, ux]
 
 **BAD：**
 ```vue
-<script setup lang="ts">
+<script setup>
 import { defineAsyncComponent } from 'vue'
 
 const AsyncComments = defineAsyncComponent({
@@ -34,7 +34,7 @@ const AsyncComments = defineAsyncComponent({
 
 **GOOD：**
 ```vue
-<script setup lang="ts">
+<script setup>
 import {
   defineAsyncComponent,
   hydrateOnVisible,
@@ -59,7 +59,7 @@ const AsyncFooter = defineAsyncComponent({
 
 **BAD：**
 ```vue
-<script setup lang="ts">
+<script setup>
 import { defineAsyncComponent } from 'vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 
@@ -73,7 +73,7 @@ const AsyncDashboard = defineAsyncComponent({
 
 **GOOD：**
 ```vue
-<script setup lang="ts">
+<script setup>
 import { defineAsyncComponent } from 'vue'
 import LoadingSpinner from './LoadingSpinner.vue'
 import ErrorDisplay from './ErrorDisplay.vue'

@@ -34,13 +34,13 @@ tags: [vue3, reactivity, ref, reactive, shallowRef, computed, watch, watchEffect
 ### 对原始值（string、number、boolean、null 等）始终使用 `shallowRef()` 而非 `ref()`，以获得更好的性能。
 
 **反面示例：**
-```ts
+```js
 import { ref } from 'vue'
 const count = ref(0)
 ```
 
 **正面示例：**
-```ts
+```js
 import { shallowRef } from 'vue'
 const count = shallowRef(0)
 ```
@@ -57,7 +57,7 @@ const count = shallowRef(0)
 - “单一状态对象”模式（store/表单）：`state.count++`、`state.items.push(...)`、`state.user.name = ...`。
 - 希望避免 `.value` 并就地更新嵌套字段的场景。
 
-```ts
+```js
 import { reactive } from 'vue'
 
 const state = reactive({
@@ -76,7 +76,7 @@ state.user.age = 31 // ✅ reactive
 - 存储 Vue 不代理其内部的外部实例/句柄（SDK 客户端、类实例）。
 - 通过替换根引用来更新的庞大数据（不可变风格的更新）。
 
-```ts
+```js
 import { shallowRef } from 'vue'
 
 const user = shallowRef({ name: 'Alice', age: 30 })
@@ -90,7 +90,7 @@ user.value = { name: 'Bob', age: 25 } // ✅ triggers update
 - 只有顶层键会变化、嵌套载荷应保持不被管理/不被代理的容器对象。
 - Vue 追踪外层包装对象但不深入追踪嵌套或外来对象的混合结构。
 
-```ts
+```js
 import { shallowReactive } from 'vue'
 
 const state = shallowReactive({
@@ -108,7 +108,7 @@ state.user.age = 31 // ❌ not reactive
 
 **反面示例：**
 
-```ts
+```js
 import { reactive } from 'vue'
 
 const state = reactive({ count: 0 })
@@ -121,7 +121,7 @@ const { count } = state // ❌ disconnected from reactivity
 
 向 `watch()` 传入一个非 getter 的值
 
-```ts
+```js
 import { reactive, watch } from 'vue'
 
 const state = reactive({ count: 0 })
@@ -134,7 +134,7 @@ watch(state.count, () => { /* ... */ })
 
 用 `toRefs()` 保留响应式，并为 `watch()` 使用 getter
 
-```ts
+```js
 import { reactive, toRefs, watch } from 'vue'
 
 const state = reactive({ count: 0 })
@@ -149,7 +149,7 @@ watch(() => state.count, () => { /* ... */ }) // ✅
 ### 优先使用 `computed`，而非通过 watcher 赋值的派生 ref
 
 **反面示例：**
-```ts
+```js
 import { ref, watchEffect } from 'vue'
 
 const items = ref([{ price: 10 }, { price: 20 }])
@@ -161,7 +161,7 @@ watchEffect(() => {
 ```
 
 **正面示例：**
-```ts
+```js
 import { ref, computed } from 'vue'
 
 const items = ref([{ price: 10 }, { price: 20 }])
@@ -267,7 +267,7 @@ computed getter 应当只做值的派生。不要做变更、不要调用 API、
 
 在 computed 中产生副作用
 
-```ts
+```js
 const count = ref(0)
 
 const doubled = computed(() => {
@@ -281,7 +281,7 @@ const doubled = computed(() => {
 
 纯净的 computed + 用 `watch()` 处理副作用
 
-```ts
+```js
 const count = ref(0)
 const doubled = computed(() => count.value * 2)
 
@@ -295,7 +295,7 @@ watch(count, (value) => {
 ### 使用 `immediate: true` 代替重复的初始调用
 
 **反面示例：**
-```ts
+```js
 import { ref, watch, onMounted } from 'vue'
 
 const userId = ref(1)
@@ -309,7 +309,7 @@ watch(userId, (id) => loadUser(id))
 ```
 
 **正面示例：**
-```ts
+```js
 import { ref, watch } from 'vue'
 
 const userId = ref(1)
@@ -327,9 +327,9 @@ watch(
 
 **正面示例：**
 
-```ts
+```js
 const query = ref('')
-const results = ref<string[]>([])
+const results = ref([])
 
 watch(query, async (q, _prev, onCleanup) => {
   const controller = new AbortController()

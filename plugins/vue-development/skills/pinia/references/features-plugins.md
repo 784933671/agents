@@ -9,7 +9,7 @@ description: 通过自定义属性、方法和行为扩展 store
 
 ## 基础插件
 
-```ts
+```js
 import { createPinia } from 'pinia'
 
 function SecretPiniaPlugin() {
@@ -28,10 +28,8 @@ store.secret // 'the cake is a lie'
 
 插件接收一个上下文对象：
 
-```ts
-import { PiniaPluginContext } from 'pinia'
-
-export function myPiniaPlugin(context: PiniaPluginContext) {
+```js
+export function myPiniaPlugin(context) {
   context.pinia   // pinia 实例
   context.app     // Vue 应用实例
   context.store   // 被扩展的 store
@@ -43,13 +41,13 @@ export function myPiniaPlugin(context: PiniaPluginContext) {
 
 返回一个对象即可添加属性（会被 devtools 追踪）：
 
-```ts
+```js
 pinia.use(() => ({ hello: 'world' }))
 ```
 
 或直接设置到 store 上：
 
-```ts
+```js
 pinia.use(({ store }) => {
   store.hello = 'world'
   // 为了在开发模式下让 devtools 可见
@@ -63,7 +61,7 @@ pinia.use(({ store }) => {
 
 同时添加到 `store` 和 `store.$state`，以支持 SSR/devtools：
 
-```ts
+```js
 import { toRef, ref } from 'vue'
 
 pinia.use(({ store }) => {
@@ -79,7 +77,7 @@ pinia.use(({ store }) => {
 
 用 `markRaw()` 包装非响应式对象：
 
-```ts
+```js
 import { markRaw } from 'vue'
 import { router } from './router'
 
@@ -92,7 +90,7 @@ pinia.use(({ store }) => {
 
 定义可被插件消费的自定义选项：
 
-```ts
+```js
 // store 定义
 defineStore('search', {
   actions: {
@@ -118,7 +116,7 @@ pinia.use(({ options, store }) => {
 
 对于 Setup Store，把选项作为第三个参数传入：
 
-```ts
+```js
 defineStore(
   'search',
   () => { /* ... */ },
@@ -128,45 +126,9 @@ defineStore(
 )
 ```
 
-## TypeScript 类型增强
-
-### 自定义属性
-
-```ts
-import 'pinia'
-import type { Router } from 'vue-router'
-
-declare module 'pinia' {
-  export interface PiniaCustomProperties {
-    router: Router
-    hello: string
-  }
-}
-```
-
-### 自定义 State
-
-```ts
-declare module 'pinia' {
-  export interface PiniaCustomStateProperties<S> {
-    hasError: boolean
-  }
-}
-```
-
-### 自定义选项
-
-```ts
-declare module 'pinia' {
-  export interface DefineStoreOptionsBase<S, Store> {
-    debounce?: Partial<Record<keyof StoreActions<Store>, number>>
-  }
-}
-```
-
 ## 在插件中订阅
 
-```ts
+```js
 pinia.use(({ store }) => {
   store.$subscribe(() => {
     // 响应 state 变化
@@ -181,11 +143,9 @@ pinia.use(({ store }) => {
 
 创建一个 Nuxt 插件来添加 Pinia 插件：
 
-```ts
-// plugins/myPiniaPlugin.ts
-import { PiniaPluginContext } from 'pinia'
-
-function MyPiniaPlugin({ store }: PiniaPluginContext) {
+```js
+// plugins/myPiniaPlugin.js
+function MyPiniaPlugin({ store }) {
   store.$subscribe((mutation) => {
     console.log(`[🍍 ${mutation.storeId}]: ${mutation.type}`)
   })

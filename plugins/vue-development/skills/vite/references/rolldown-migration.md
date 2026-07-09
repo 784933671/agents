@@ -27,7 +27,7 @@ Vite 8 用 Rolldown（统一的基于 Rust 的打包器）替换了 esbuild+Roll
 
 ### rollupOptions → rolldownOptions
 
-```ts
+```js
 // 迁移前（Vite 7）
 export default defineConfig({
   build: {
@@ -51,7 +51,7 @@ export default defineConfig({
 
 ### esbuild → oxc
 
-```ts
+```js
 // 迁移前（Vite 7）
 export default defineConfig({
   esbuild: {
@@ -74,7 +74,7 @@ export default defineConfig({
 
 ### JSX 配置
 
-```ts
+```js
 export default defineConfig({
   oxc: {
     jsx: {
@@ -88,10 +88,10 @@ export default defineConfig({
 
 ### 自定义转换目标
 
-```ts
+```js
 export default defineConfig({
   oxc: {
-    include: ['**/*.ts', '**/*.tsx'],
+    include: ['**/*.js', '**/*.jsx'],
     exclude: ['node_modules/**'],
   },
 })
@@ -103,7 +103,7 @@ export default defineConfig({
 
 如果插件只在构建时工作：
 
-```ts
+```js
 {
   ...rollupPlugin(),
   enforce: 'post',

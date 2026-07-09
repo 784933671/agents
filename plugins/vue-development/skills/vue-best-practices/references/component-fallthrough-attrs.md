@@ -158,17 +158,17 @@ function handleClick(event) {
 </template>
 ```
 
-## TypeScript 注意事项
+## JavaScript 注意事项
 
-`useAttrs()` 的类型是 `Record<string, unknown>`，因此需要时应对单个键进行类型断言。
+`useAttrs()` 返回透传属性对象。读取单个键时先判断是否存在，再按运行时值处理。
 
 ```vue
-<script setup lang="ts">
+<script setup>
 import { useAttrs } from 'vue'
 
 const attrs = useAttrs()
 
-const testId = attrs['data-testid'] as string | undefined
-const onClick = attrs.onClick as ((event: MouseEvent) => void) | undefined
+const testId = typeof attrs['data-testid'] === 'string' ? attrs['data-testid'] : undefined
+const onClick = typeof attrs.onClick === 'function' ? attrs.onClick : undefined
 </script>
 ```

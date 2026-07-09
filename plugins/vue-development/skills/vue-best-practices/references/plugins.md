@@ -3,7 +3,7 @@ title: Vue 插件最佳实践
 impact: MEDIUM
 impactDescription: 错误的插件结构或 injection key 策略会导致安装失败、键名冲突以及不安全的 API
 type: best-practice
-tags: [vue3, plugins, provide-inject, typescript, dependency-injection]
+tags: [vue3, plugins, provide-inject, javascript, dependency-injection]
 ---
 
 # Vue 插件最佳实践
@@ -14,9 +14,9 @@ tags: [vue3, plugins, provide-inject, typescript, dependency-injection]
 
 - 以带有 `install()` 的对象或 install 函数的形式导出插件
 - 在 `install()` 中使用 `app` 实例注册 component/directive/provide
-- 使用 `Plugin` 类型（必要时配合 options 元组类型）为插件 API 提供类型
-- 在插件中为 `provide/inject` 使用 symbol key（优先使用 `InjectionKey<T>`）
-- 为必需的注入提供一个小巧且带类型的 composable 包装，以便快速失败
+- 使用稳定的 install 参数约定说明插件 API
+- 在插件中为 `provide/inject` 使用 symbol key
+- 为必需的注入提供一个小巧的 composable 包装，以便快速失败
 
 ## 为 `app.use()` 设计插件结构
 
@@ -25,7 +25,7 @@ Vue 插件必须是以下两种形式之一：
 - 具有相同签名的函数
 
 **反面示例：**
-```ts
+```js
 const notAPlugin = {
   doSomething() {}
 }
@@ -34,16 +34,9 @@ app.use(notAPlugin)
 ```
 
 **正面示例：**
-```ts
-import type { App } from 'vue'
-
-interface PluginOptions {
-  prefix?: string
-  debug?: boolean
-}
-
+```js
 const myPlugin = {
-  install(app: App, options: PluginOptions = {}) {
+  install(app, options = {}) {
     const { prefix = 'my', debug = false } = options
 
     if (debug) {
@@ -58,10 +51,8 @@ app.use(myPlugin, { prefix: 'custom', debug: true })
 ```
 
 **正面示例：**
-```ts
-import type { App } from 'vue'
-
-function simplePlugin(app: App, options?: { message: string }) {
+```js
+function simplePlugin(app, options = {}) {
   app.config.globalProperties.$greet = () => options?.message ?? 'Hello!'
 }
 
@@ -77,7 +68,7 @@ app.use(simplePlugin, { message: 'Welcome!' })
 - 使用 `app.config.globalProperties` 注册可选的全局辅助方法（谨慎使用）
 
 **反面示例：**
-```ts
+```js
 const uselessPlugin = {
   install(app, options) {
     const service = createService(options)
@@ -86,7 +77,7 @@ const uselessPlugin = {
 ```
 
 **正面示例：**
-```ts
+```js
 const usefulPlugin = {
   install(app, options) {
     const service = createService(options)
@@ -95,19 +86,16 @@ const usefulPlugin = {
 }
 ```
 
-## 为插件契约提供类型
+## 为插件契约提供清晰约定
 
-使用 Vue 的 `Plugin` 类型，让 install 签名和 options 保持类型安全。
+在 install 入口校验必需参数，避免插件以半初始化状态运行。
 
-```ts
-import type { App, Plugin } from 'vue'
-
-interface MyOptions {
-  apiKey: string
-}
-
-const myPlugin: Plugin<[MyOptions]> = {
-  install(app: App, options: MyOptions) {
+```js
+const myPlugin = {
+  install(app, options = {}) {
+    if (!options.apiKey) {
+      throw new Error('apiKey is required')
+    }
     app.provide(apiKeyKey, options.apiKey)
   }
 }
@@ -115,10 +103,10 @@ const myPlugin: Plugin<[MyOptions]> = {
 
 ## 在插件中使用 Symbol Injection Key
 
-字符串 key 可能会冲突（如 `'http'`、`'config'`、`'i18n'`）。使用 `InjectionKey<T>` 包装的 symbol key，可以让注入既唯一又带类型。
+字符串 key 可能会冲突（如 `'http'`、`'config'`、`'i18n'`）。使用 symbol key 可以让注入 key 保持唯一。
 
 **反面示例：**
-```ts
+```js
 export default {
   install(app) {
     app.provide('http', axios)
@@ -128,17 +116,9 @@ export default {
 ```
 
 **正面示例：**
-```ts
-import type { InjectionKey } from 'vue'
-import type { AxiosInstance } from 'axios'
-
-interface AppConfig {
-  apiUrl: string
-  timeout: number
-}
-
-export const httpKey: InjectionKey<AxiosInstance> = Symbol('http')
-export const configKey: InjectionKey<AppConfig> = Symbol('appConfig')
+```js
+export const httpKey = Symbol('http')
+export const configKey = Symbol('appConfig')
 
 export default {
   install(app) {
@@ -152,11 +132,11 @@ export default {
 
 将必需的注入封装在 composable 中，并在缺少时抛出清晰的 setup 错误。
 
-```ts
+```js
 import { inject } from 'vue'
-import { authKey, type AuthService } from '@/injection-keys'
+import { authKey } from '@/injection-keys'
 
-export function useAuth(): AuthService {
+export function useAuth() {
   const auth = inject(authKey)
   if (!auth) {
     throw new Error('Auth plugin not installed. Did you forget app.use(authPlugin)?')
